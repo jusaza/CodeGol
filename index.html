@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Escuela de Fútbol Pinze</title>
+<style>
+  /* Reset básico */
+  *, *::before, *::after {
+    margin: 0; padding: 0; box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: #f0f4fb; /* azul muy suave para fondo */
+    color: #111;
+    line-height: 1.6;
+  }
+
+  header {
+    background-color: #001f3f; /* azul oscuro */
+    padding: 20px 40px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .logo img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 12px;
+    border: 3px solid #00bfff; /* borde celeste */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .logo img:hover,
+  .logo img:focus-visible {
+    transform: scale(1.1);
+    box-shadow: 0 0 10px #00bfff;
+    outline: none;
+  }
+
+  .logo h2 {
+    color: #00bfff; /* celeste */
+    font-weight: 700;
+    font-size: 1.5rem;
+  }
+
+  nav a {
+    color: #cce7ff; /* celeste clarito */
+    margin-left: 18px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: color 0.3s ease;
+  }
+
+  nav a:hover,
+  nav a:focus-visible {
+    color: #00bfff; /* celeste más vivo */
+    outline: none;
+    background: transparent; /* sin fondo */
+  }
+
+  nav a.iniciar-sesion {
+    background-color: #0074d9; /* azul medio */
+    color: #f0f8ff; /* blanco azulado */
+    padding: 10px 20px;
+    transition: background-color 0.3s ease;
+  }
+
+  nav a.iniciar-sesion:hover,
+  nav a.iniciar-sesion:focus-visible {
+    background-color: #005fa3; /* azul más oscuro */
+    color: #f0f8ff;
+    outline: none;
+  }
+
+  main {
+    max-width: 900px;
+    margin: 40px auto 80px;
+    padding: 0 20px;
+  }
+
+  section {
+    margin-bottom: 60px;
+    padding: 30px 20px;
+    border-radius: 12px;
+    background-color: #ffffffcc; /* blanco translúcido para que se vea distinto del fondo */
+    box-shadow: 0 6px 15px rgba(0, 31, 63, 0.1);
+    transition: box-shadow 0.3s ease;
+  }
+
+  section:hover {
+    box-shadow: 0 10px 30px rgba(0, 95, 163, 0.2);
+  }
+
+  section h2 {
+    font-size: 2rem;
+    margin-bottom: 25px;
+    font-weight: 700;
+    color: #001f3f; /* azul oscuro */
+    border-bottom: 3px solid #00bfff; /* barra celeste debajo */
+    padding-bottom: 8px;
+    text-align: center;
+  }
+
+  /* Cuadro azul para bienvenida */
+  .hero {
+    background-color: #cce7ff; /* azul celeste suave */
+    padding: 60px 30px 50px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 95, 163, 0.2);
+    margin-bottom: 50px;
+  }
+
+  .hero h1 {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: #001f3f;
+  }
+
+  .hero p {
+    font-size: 1.3rem;
+    color: #005fa3; /* azul oscuro más claro */
+  }
+
+  .servicios-container {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .servicio {
+    background-color: #e6f0ff; /* celeste muy claro */
+    padding: 25px 20px;
+    border-radius: 8px;
+    width: 280px;
+    box-shadow: 0 3px 8px rgba(0, 95, 163, 0.2);
+    cursor: default;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+
+  .servicio:hover,
+  .servicio:focus-within {
+    box-shadow: 0 8px 16px rgba(0, 95, 163, 0.4);
+    transform: translateY(-5px);
+    outline: none;
+  }
+
+  .servicio h3 {
+    margin-bottom: 14px;
+    color: #001f3f;
+    font-weight: 700;
+  }
+
+  .servicio p {
+    color: #003566;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .sobre p,
+  .contacto p {
+    max-width: 700px;
+    color: #003566;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin: 0 auto;
+  }
+
+  footer {
+    background-color: #001f3f;
+    color: #cce7ff;
+    text-align: center;
+    padding: 30px 20px;
+  }
+
+  footer p {
+    margin-bottom: 15px;
+    font-size: 1rem;
+  }
+
+  .redes a {
+    color: #cce7ff;
+    margin: 0 12px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+  }
+
+  .redes a:hover,
+  .redes a:focus-visible {
+    color: #00bfff;
+    outline: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    header {
+      flex-direction: column;
+      padding: 15px 20px;
+    }
+    nav a {
+      margin: 10px 10px 0;
+    }
+    main {
+      margin: 30px auto 60px;
+      padding: 0 15px;
+    }
+    .servicios-container {
+      flex-direction: column;
+      align-items: center;
+    }
+    section {
+      margin-bottom: 40px;
+      padding: 20px 15px;
+    }
+    .hero {
+      padding: 50px 20px 40px;
+      margin-bottom: 30px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo" tabindex="0" aria-label="Logo Escuela de Fútbol Pinze">
+    <img src="imagenes/logo.jpg" alt="Logo Escuela de Fútbol Pinze" />
+    <h2>Escuela de Fútbol Pinze</h2>
+  </div>
+  <nav>
+    <a href="#inicio">Inicio</a>
+    <a href="#servicios">Servicios</a>
+    <a href="#sobre">Nosotros</a>
+    <a href="#contacto">Contacto</a>
+    <a href="inicio_sesion.html" class="iniciar-sesion">Iniciar sesión</a>
+  </nav>
+</header>
+
+<main>
+  <section id="inicio" class="hero" role="banner" aria-label="Bienvenida">
+    <h1>Bienvenido a la Escuela de Fútbol Pinze</h1>
+    <p>¡Formamos campeones dentro y fuera de la cancha!</p>
+  </section>
+
+  <section id="servicios" aria-labelledby="servicios-title">
+    <h2 id="servicios-title">Nuestros Servicios</h2>
+    <div class="servicios-container">
+      <article class="servicio" tabindex="0">
+        <h3>Entrenamientos Infantiles</h3>
+        <p>Enseñamos técnica y valores a niños de 4 a 10 años con métodos divertidos y seguros.</p>
+      </article>
+      <article class="servicio" tabindex="0">
+        <h3>Formación Avanzada</h3>
+        <p>Entrenamientos intensivos para jugadores que desean competir al máximo nivel.</p>
+      </article>
+      <article class="servicio" tabindex="0">
+        <h3>Visorias y Torneos</h3>
+        <p>Oportunidades para que los jugadores sean observados por equipos profesionales.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="sobre" aria-labelledby="sobre-title">
+    <h2 id="sobre-title">Nosotros</h2>
+    <p>
+      Somos una escuela apasionada por el fútbol, comprometida con formar talento humano y deportivo. 
+      Nuestra misión es desarrollar habilidades, valores y trabajo en equipo para impulsar a nuestros jugadores hacia el éxito.
+    </p>
+  </section>
+
+  <section id="contacto" aria-labelledby="contacto-title">
+    <h2 id="contacto-title">Contacto</h2>
+    <p>Teléfono: +57 310 555 1234</p>
+    <p>Email: contacto@futbolpinze.com</p>
+    <p>Dirección: Calle 123 #45-67, Bogotá, Colombia</p>
+  </section>
+</main>
+
+<footer>
+  <p>&copy; 2025 Escuela de Fútbol Pinze. Todos los derechos reservados.</p>
+  <nav class="redes" aria-label="Redes sociales">
+    <a href="#" target="_blank" rel="noopener noreferrer">Facebook</a> |
+    <a href="#" target="_blank" rel="noopener noreferrer">Instagram</a> |
+    <a href="#" target="_blank" rel="noopener noreferrer">YouTube</a>
+  </nav>
+</footer>
+
+</body>
+</html>
