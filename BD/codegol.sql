@@ -97,6 +97,7 @@ create table rendimiento (
   pase tinyint not null,
   tecnica tinyint not null,
   promedio decimal (5,2) generated always as ((velocidad + potencia_tiro + defensa + regate + pase + tecnica) / 6) stored,  observaciones varchar(60) null,
+  observaciones varchar(100) null,
   estado enum('activo','inactivo') not null,
   id_jugador tinyint unsigned not null,
   registrado_por tinyint unsigned not null,
