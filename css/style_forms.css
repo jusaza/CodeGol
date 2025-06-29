@@ -60,7 +60,6 @@ header {
 }
 
 .volver {
-  font-family: 'Segoe UI', sans-serif;
   font-size: 20px;
   font-weight: 600;
   color: #ffffff;
@@ -101,7 +100,7 @@ form {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
+  gap: 20px;
   width: 100%;
 }
 
@@ -116,13 +115,13 @@ label {
   font-weight: 700;
   font-size: 15px;
   text-align: center;
-  display: block;
   margin-bottom: 5px;
 }
 
 input[type="number"],
 input[type="text"],
 input[type="date"],
+input[type="time"],
 input[type="password"],
 input[type="email"],
 input[type="file"],
@@ -134,9 +133,8 @@ select {
   border: 1.5px solid #001f3f;
   border-radius: 6px;
   color: #111;
-  font-family: sans-serif;
   font-weight: 400;
-  transition: border-color 0.3s ease;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
   text-align: center;
   background-color: white;
 }
@@ -144,11 +142,13 @@ select {
 input[type="number"]:focus,
 input[type="text"]:focus,
 input[type="date"]:focus,
+input[type="time"]:focus,
 input[type="password"]:focus,
 input[type="email"]:focus,
 input[type="file"]:focus,
 select:focus {
   border-color: #00bfff;
+  box-shadow: 0 0 5px rgba(0,191,255,0.4);
   outline: none;
 }
 
@@ -162,17 +162,22 @@ input::placeholder {
 button {
   background-color: #001f3f;
   color: white;
-  padding: 10px 25px;
+  padding: 12px 25px;
   font-size: 15px;
   font-weight: 500;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  margin: 20px auto 0;
+  margin: 25px auto 0;
   width: 60%;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 button:hover {
   background-color: #0074d9;
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: scale(0.98);
 }
