@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Rendimiento - Escuela de Fútbol Pinze</title>
+  <link rel="stylesheet" href="css/style_pag_prin.css" />
+  <link rel="stylesheet" href="css/stylepag.css" />
+</head>
+<body>
+  <aside class="menu">
+    <a href="./pagina original.html" class="logo" aria-label="Logo Escuela de Fútbol Pinze">
+      <img src="./imagenes/logo.jpg" alt="Logo Escuela de Fútbol Pinze" />
+    </a>
+    <h2>⚽ Menú ⚽</h2>
+    <ul>
+      <li><a href="./registropag.html">Usuarios</a></li>
+      <li><a href="./entrenopag.html">Entrenamiento</a></li>
+      <li><a href="./inventariopag.html">Inventario</a></li>
+      <li><a href="./rendimientopag.html">Rendimiento</a></li>
+      <li><a href="./matriculapag.html">Matrícula</a></li>
+      <li><a href="./pagopag.html">Pago</a></li>
+    </ul>
+    <a href="./index.html" class="cerrar-sesion">Cerrar sesión</a>
+  </aside>
+
+  <div class="contenido">
+    <br>
+    <div class="barra-top">
+      <div class="barra-busqueda">
+        <input type="text" placeholder="Buscar rendimiento..." />
+      </div>
+      <a href="./formularios/rendimiento.html" class="boton-registrar">Registrar rendimiento</a>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Fecha</th>
+          <th>Posición</th>
+          <th>Acciones</th>
+          <th>Acciones</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>2025-06-15</td>
+          <td>Delantero</td>
+          <td>Delantero</td>
+          <td>Delantero</td>
+          <td class="acciones"> 
+            <button class="ver-mas" data-id="1">Ver más</button>
+            <button class="actualizar">Actualizar</button>
+            <button class="eliminar">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="ventana-flotante" id="detalle-usuario-1">
+    <ul>
+      <li><strong>ID Rendimiento:</strong> 1</li>
+      <li><strong>Fecha Evaluación:</strong> 2025-06-15</li>
+      <li><strong>Posición:</strong> Delantero</li>
+      <li><strong>Categorías Test:</strong> Velocidad, Resistencia</li>
+      <li><strong>Tipo de Test:</strong> Cooper</li>
+      <li><strong>Unidad:</strong> segundos</li>
+      <li><strong>Resultado:</strong> 12.5</li>
+      <li><strong>Observaciones:</strong> Buen rendimiento general</li>
+      <li><strong>ID Jugador:</strong> 10</li>
+      <li><strong>Registrado por:</strong> 3</li>
+    </ul>
+  </div>
+
+  <div class="ventana-flotante" id="detalle-usuario-2">
+    <ul>
+      <li><strong>ID Rendimiento:</strong> 2</li>
+      <li><strong>Fecha Evaluación:</strong> 2025-06-20</li>
+      <li><strong>Posición:</strong> Portero</li>
+      <li><strong>Categorías Test:</strong> Salto, Reflejos</li>
+      <li><strong>Tipo de Test:</strong> Salto vertical</li>
+      <li><strong>Unidad:</strong> metros</li>
+      <li><strong>Resultado:</strong> 0.85</li>
+      <li><strong>Observaciones:</strong> Necesita mejorar reflejos</li>
+      <li><strong>ID Jugador:</strong> 5</li>
+      <li><strong>Registrado por:</strong> 3</li>
+    </ul>
+  </div>
+
+  <script>
+    const btnVerMas = document.querySelectorAll('.ver-mas');
+    const ventanas = document.querySelectorAll('.ventana-flotante');
+
+    btnVerMas.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        const ventana = document.getElementById('detalle-usuario-' + id);
+        ventana.classList.add('active');
+      });
+    });
+
+    window.addEventListener('click', function(e) {
+      ventanas.forEach(ventana => {
+        if (ventana.classList.contains('active') && !ventana.contains(e.target) && !e.target.classList.contains('ver-mas')) {
+          ventana.classList.remove('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
