@@ -22,13 +22,13 @@
       <label for="id">Id del entrenamiento</label>
       <input type="number" id="id" name="id" placeholder="Ingrese el ID" required>
     </div>
+    <div>
+      <label for="descripcion">Descripción</label>
+      <input type="text" id="descripcion" name="descripcion" placeholder="Ingrese la Descripción" required>
+    </div>
     <div class="Formgrupo">
       <label for="fecha">Fecha</label>
       <input type="date" id="fecha" name="fecha" required>
-    </div>
-    <div class="Formgrupo">
-      <label for="lugar">Lugar</label>
-      <input type="text" id="lugar" name="lugar" placeholder="Ingrese el lugar" required>
     </div>
     <div class="Formgrupo">
       <label for="hora_inicio">Hora inicio</label>
@@ -39,16 +39,15 @@
       <input type="time" id="hora_fin" name="hora_fin" required>
     </div>
     <div class="Formgrupo">
-      <label for="tipo_entrenamiento">Tipo entrenamiento</label>
-      <select id="tipo_entrenamiento" name="tipo_entrenamiento" required>
-        <option value="">Seleccione un tipo</option>
-        <option value="tecnico">Técnico</option>
-        <option value="tactico">Táctico</option>
-        <option value="fisico">Físico</option>
-        <option value="recreativo">Recreativo</option>
-      </select>
+      <label for="lugar">Lugar</label>
+      <input type="text" id="lugar" name="lugar" placeholder="Ingrese el lugar" required>
     </div>
-    <button type="submit">Guardar entrenamiento</button>
+    <div>
+      <label for="registrado_por"></label>
+      <input type="hidden" name="registrado_por" id="registrado_por" placeholder="Ingresa la persona que hizo el registro" readonly>
+    </div>    
+
+            <button type="submit">Guardar entrenamiento</button>
   </form>
 </div>
 
