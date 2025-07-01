@@ -6,7 +6,6 @@
   align-items: center;
 }
 
-/* Barra superior con búsqueda y botón */
 .barra-top {
   width: 90%;
   max-width: 1100px;
@@ -65,7 +64,7 @@ th, td {
   padding: 12px 15px;
   text-align: center;
   vertical-align: middle;
-  border-bottom: none; /* Quita la línea entre registros */
+  border-bottom: none;
   box-sizing: border-box;
   line-height: 1.4;
 }
@@ -103,22 +102,20 @@ tr:hover {
   color: rgb(32, 117, 70);
 }
 
-
 .acciones .actualizar {
   background-color: #0074d9;
   color: white;
 }
-
 
 .acciones .eliminar {
   background-color: #ff4136;
   color: white;
 }
 
-
 .acciones button:hover {
   opacity: 0.9;
 }
+
 
 .ventana-flotante {
   position: fixed;
@@ -131,12 +128,30 @@ tr:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   display: none;
-  max-width: 90%;
-  width: 400px;
+  max-width: 800px;
+  width: 90%;
+  display: none;
+  flex-direction: row;
+  gap: 20px;
+  align-items: flex-start;
 }
 
 .ventana-flotante.active {
-  display: block;
+  display: flex;
+}
+
+.ventana-flotante .grafico {
+  flex: 1;
+}
+
+.ventana-flotante .info {
+  flex: 1;
+}
+
+.ventana-flotante canvas {
+  width: 100%;
+  height: auto;
+  max-width: 300px;
 }
 
 .ventana-flotante ul {
@@ -149,6 +164,54 @@ tr:hover {
   margin-bottom: 10px;
   font-size: 15px;
   text-align: left;
+  color: #001f3f;
 }
 
 
+form.registro-rendimiento {
+  background: #fff;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 800px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+form.registro-rendimiento input, select, button {
+  padding: 8px;
+  font-size: 1em;
+  flex: 1 1 45%;
+}
+
+form.registro-rendimiento button {
+  background-color: #0f5897;
+  color: white;
+  border: none;
+  cursor: pointer;
+  flex: 1 1 100%;
+}
+
+
+.grafica-container {
+  width: 100%;
+  max-width: 500px;
+  margin: 30px auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+#graficaRadar {
+  width: 100%;
+  height: auto;
+}
+
+
+h3.titulo-formulario {
+  text-align: center;
+  margin-top: 20px;
+}

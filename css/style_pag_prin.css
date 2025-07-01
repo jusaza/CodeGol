@@ -160,13 +160,13 @@ body {
 }
 
 header {
+  width: 100%;
   background-color: #0f5897;
   color: white;
   padding: 25px;
   text-align: center;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
-
 main {
   flex-grow: 1;
   padding: 30px;
