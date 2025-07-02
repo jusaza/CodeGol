@@ -109,6 +109,7 @@ form.form-solo {
   margin-bottom: 6px;
   font-weight: 600;
   font-size: 15px;
+  padding-top: 10px;
 }
 
 input[type="number"],
