@@ -21,7 +21,7 @@ body {
   padding: 20px;
   flex-shrink: 0;
   position: relative;
-  border-left: 8px solid  #0a4f8b;
+  border-left: 8px solid #0a4f8b;
 }
 
 /* Logo */
@@ -70,9 +70,6 @@ body {
   color: white;
   font-weight: bold;
   transition: color 0.3s ease;
-  background: none;
-  outline: none;
-  box-shadow: none;
   display: block;
   padding: 8px 12px;
   border-radius: 5px;
@@ -82,47 +79,6 @@ body {
 .menu ul li a:focus-visible {
   color: #97bcc9;
   background: rgba(12, 12, 12, 0.2);
-  outline: none;
-  box-shadow: none;
-}
-
-/* Submenús */
-.submenu {
-  display: none;
-  position: absolute;
-  left: 100%;
-  top: 0;
-  background-color: #699fd6;
-  padding: 10px 0;
-  list-style: none;
-  min-width: 200px;
-  border-left: 2px solid #0074D9;
-  z-index: 100;
-  border-radius: 0 8px 8px 0;
-  box-shadow: 3px 3px 10px rgba(0,0,0,0.3);
-}
-
-.submenu li {
-  margin: 0;
-}
-
-.submenu li a {
-  padding: 10px 20px;
-  display: block;
-  color: white;
-  text-decoration: none;
-  font-weight: normal;
-  transition: background-color 0.3s ease;
-  border-radius: 0;
-}
-
-.submenu li a:hover {
-  background-color: #005fa3;
-}
-
-/* Mostrar submenú al hover */
-.menu ul li:hover > .submenu {
-  display: block;
 }
 
 /* Botón cerrar sesión */
@@ -133,22 +89,18 @@ body {
   right: 20px;
   padding: 10px;
   background-color: #960707;
-  border: none;
   color: white;
   font-weight: bold;
-  cursor: pointer;
   border-radius: 5px;
-  transition: background-color 0.3s ease;
   text-align: center;
   text-decoration: none;
   display: block;
+  transition: background-color 0.3s ease;
 }
 
 .cerrar-sesion:hover,
 .cerrar-sesion:focus-visible {
   background-color: #7a0505;
-  outline: none;
-  box-shadow: none;
 }
 
 /* Contenido */
@@ -167,6 +119,7 @@ header {
   text-align: center;
   box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
+
 main {
   flex-grow: 1;
   padding: 30px;
@@ -234,51 +187,88 @@ footer {
   text-align: center;
   padding: 15px;
   font-size: 14px;
-  font-family: 'Segoe UI', sans-serif;
   margin-top: auto;
 }
 
-.bienvenida {
+/* Bienvenida y barrita */
+.bienvenida, .barrita {
   background: #e9e9fb;
   padding: 25px 30px;
   border-left: 8px solid #0a4f8b;
-  border-right: 8px solid #0a4f8b ;
+  border-right: 8px solid #0a4f8b;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   margin-bottom: 40px;
 }
 
-.bienvenida h2 {
+.bienvenida h2, .barrita h2 {
   color: #001f3f;
   margin-bottom: 10px;
   font-size: 24px;
-  text-align: center;
-}
-
-.bienvenida p {
-  color: #333;
-  font-size: 16px;
-  line-height: 1.5;
-  text-align: center;
 }
 
 .barrita {
   background: #001f3f;
-  padding: 25px 30px;
-  border-left: 8px solid  #0a4f8b;
-  border-right: 8px solid  #0a4f8b;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  margin-bottom: 40px;
 }
 
-.barrita h2 {
-  color: #ffffff;
-  margin-bottom: 10px;
-  font-size: 24px;
-  text-align: center;
+.barrita h2, .barrita p {
+  color: white;
 }
 
-p{
-  color: #ffffff;
+/* ---------------------- RESPONSIVE ---------------------- */
+
+@media (max-width: 900px) {
+  body {
+    flex-direction: column;
+  }
+
+  .menu {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+    border-left: none;
+    border-bottom: 8px solid #0a4f8b;
+    padding: 10px;
+    position: static;
+  }
+
+  .menu h2 {
+    font-size: 18px;
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+
+  .menu ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .menu ul li {
+    margin: 5px 10px;
+  }
+
+  .cerrar-sesion {
+    position: static;
+    margin-top: 10px;
+    width: auto;
+  }
+
+  main {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .galeria {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .tarjeta img {
+    height: 250px;
+  }
 }

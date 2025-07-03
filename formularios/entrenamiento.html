@@ -18,10 +18,6 @@
 <div class="login-box" role="main" aria-label="Formulario de registro de entrenamiento">
   <h1>Entrenamiento</h1>
   <form action="../entrenopag.html" method="GET">
-    <div class="Formgrupo">
-      <label for="id">Id del entrenamiento</label>
-      <input type="number" id="id" name="id" placeholder="Ingrese el ID" required>
-    </div>
     <div>
       <label for="descripcion">Descripción</label>
       <input type="text" id="descripcion" name="descripcion" placeholder="Ingrese la Descripción" required>
@@ -45,8 +41,12 @@
     <div>
       <label for="registrado_por"></label>
       <input type="hidden" name="registrado_por" id="registrado_por" placeholder="Ingresa la persona que hizo el registro" readonly>
-    </div>    
-
+    </div>  
+    <div class="Formgrupo">
+      <label for="id"></label>
+      <input type="hidden" id="id" name="id" placeholder="El sistema genera el id" readonly>
+    </div>  
+ 
             <button type="submit">Guardar entrenamiento</button>
   </form>
 </div>

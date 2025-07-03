@@ -2,15 +2,14 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: #001f3f;
+  text-align: center;
 }
 
 body {
-  font-family: 'Segoe UI', sans-serif;
   background: url('../imagenes/fondo-formulario.jpg') no-repeat center center fixed;
-  background-color: #f0f0f0;
-  color: #111;
+  background-size: cover;
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -19,6 +18,7 @@ body {
   padding-top: 90px;
 }
 
+/* Header */
 header {
   position: fixed;
   top: 0;
@@ -49,7 +49,6 @@ header {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
 }
 
 .logo:hover {
@@ -62,96 +61,83 @@ header {
   font-weight: 600;
   color: #ffffff;
   text-decoration: none;
-  cursor: pointer;
   transition: color 0.3s ease;
 }
 
-.volver:hover,
-.volver:focus {
+.volver:hover {
   color: #00bfff;
   text-decoration: underline;
 }
 
+/* Caja del login */
 .login-box {
-  background-color: white;
-  max-width: 700px;
+  background: rgba(255,255,255,0.9);
+  max-width: 400px;
   width: 90%;
   padding: 40px 30px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  text-align: center;
+  border-radius: 10px;
   border: 4px solid #0a4f8b;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  text-align: center;
+  text-align: center;
 }
 
 .login-box h1 {
   font-size: 24px;
   margin-bottom: 30px;
+  color: #0b1649;
 }
 
-/* Formulario en grid */
-form {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px 30px;
-  width: 100%;
+/* Formulario */
+form.form-solo {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
+/* Grupo único del form */
 .Formgrupo {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
+  text-align: center;
 }
 
-label {
-  font-weight: 700;
+.Formgrupo label {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 6px;
+  font-weight: 600;
   font-size: 15px;
-  margin-bottom: 5px;
+  padding-top: 10px;
 }
 
 input[type="number"],
-input[type="text"],
-input[type="date"],
-input[type="time"],
-input[type="password"],
-input[type="email"],
-input[type="file"],
-select {
+input[type="password"] {
   width: 100%;
-  max-width: 300px;
   padding: 10px 14px;
   font-size: 15px;
   border: 1.5px solid #001f3f;
   border-radius: 6px;
   background-color: white;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  text-align: center;
 }
 
-input:focus,
-select:focus {
+input[type="number"]:focus,
+input[type="password"]:focus {
   border-color: #00bfff;
   box-shadow: 0 0 5px rgba(0,191,255,0.4);
   outline: none;
 }
 
-input::placeholder {
-  color: #888;
-  font-size: 14px;
-}
-
 button {
-  grid-column: 1 / -1;
   background-color: #001f3f;
   color: white;
   padding: 12px 25px;
   font-size: 15px;
   border-radius: 6px;
   cursor: pointer;
-  width: 50%;
   transition: background-color 0.3s ease, transform 0.2s ease;
-  display: block;
-  margin: 0 auto;
 }
 
 button:hover {
@@ -159,35 +145,28 @@ button:hover {
   transform: translateY(-2px);
 }
 
-/* ---------------------- RESPONSIVE ---------------------- */
-@media (max-width: 768px) {
-  form {
-    grid-template-columns: 1fr;
-    gap: 15px;
-  }
-
-  button {
-    width: 80%;
-  }
+/* Enlaces adicionales */
+.extra-links {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
+.extra-links a {
+  color: #001f3f;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.extra-links a:hover {
+  color: #00bfff;
+  text-decoration: underline;
+}
+
+/* Responsivo */
 @media (max-width: 480px) {
   .login-box {
     padding: 30px 20px;
-  }
-
-  input[type="number"],
-  input[type="text"],
-  input[type="date"],
-  input[type="time"],
-  input[type="password"],
-  input[type="email"],
-  input[type="file"],
-  select {
-    max-width: 90%;
-  }
-
-  button {
-    width: 90%;
   }
 }
