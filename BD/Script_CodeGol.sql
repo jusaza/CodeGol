@@ -19,7 +19,7 @@ create table usuario (
   lugar_nacimiento varchar(50) null comment 'ciudad o país de nacimiento',
   grupo_sanguineo enum('a+','a-','b+','b-','ab+','ab-','o+','o-') not null comment 'tipo de sangre',
   foto_perfil blob default null comment 'imagen del perfil del usuario',
-  estado enum('activo','inactivo') not null comment 'estado del usuario',
+  estado enum('activo','inactivo') not null default 'activo' comment 'estado del usuario',
   registrado_por tinyint unsigned not null default 1 comment 'id del usuario que lo registró',
   id_responsable tinyint unsigned not null comment 'id del responsable del usuario',
   constraint fk_usuario_registrado_por foreign key (registrado_por) references usuario (id_usuario),
@@ -29,7 +29,7 @@ create table usuario (
 -- tabla: rol
 create table rol (
   id_rol tinyint unsigned auto_increment primary key comment 'identificador único del rol',
-  rol_usuario varchar(30) not null comment 'nombre del rol asignado'
+  rol_usuario enum("Administrador","Entrenador","Responsable","Jugador") not null unique comment 'nombre del rol asignado'
 );
 
 -- tabla: inventario
@@ -39,7 +39,7 @@ create table inventario (
   cantidad_total tinyint unsigned not null comment 'cantidad total disponible',
   descripcion varchar(100) null comment 'detalle adicional del artículo',
   fecha_ingreso date not null comment 'fecha en que se registró el artículo',
-  estado enum('activo','inactivo') not null comment 'estado del artículo'
+  estado enum('activo','inactivo') not null default 'activo' comment 'estado del artículo'
 );
 
 -- tabla: entrenamiento
@@ -51,7 +51,7 @@ create table entrenamiento (
   hora_fin time not null comment 'hora de finalización',
   lugar varchar(50) not null comment 'lugar donde se realiza',
   observaciones varchar(100) null comment 'notas u observaciones',
-  estado enum('activo','inactivo') not null comment 'estado del entrenamiento',
+  estado enum('activo','inactivo') not null default 'activo' comment 'estado del entrenamiento',
   registrado_por tinyint unsigned not null comment 'usuario que registró el entrenamiento',
   constraint fk_entreregistrado foreign key (registrado_por) references usuario (id_usuario)
 );
@@ -62,7 +62,7 @@ create table matricula (
   fecha_matricula date default current_timestamp not null comment 'fecha en que se hizo la matrícula',
   fecha_inicio date not null comment 'fecha de inicio del proceso',
   fecha_fin date not null comment 'fecha de finalización',
-  estado enum('activo','inactivo') not null comment 'estado de la matrícula',
+  estado enum('activo','inactivo') not null default 'activo' comment 'estado de la matrícula',
   observaciones varchar(100) null comment 'notas u observaciones',
   id_jugador tinyint unsigned not null comment 'usuario matriculado',
   registrado_por tinyint unsigned not null comment 'usuario que hizo el registro',

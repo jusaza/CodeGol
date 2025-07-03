@@ -11,19 +11,23 @@ where r.nombre_rol = 'entrenador';
 -- artículos activos
 select * from inventario where estado = 'activo';
 
+select * from inventario where nombre_articulo like concat('%', nombre, '%');
+
 -- pagos realizados por el usuario 1
 select * from pago where pagado_por = 1;
 
--- total usado por fecha
-select fecha_uso, sum(cantidad_usada) as total_usado
-from uso_detalle
-group by fecha_uso;
+select * from pago where fecha_pago = fecha;
 
 -- roles asignados por usuario
 select u.nombre_completo, r.nombre_rol
 from usuario u
 join usuario_rol ur on u.id_usuario = ur.id_usuario
 join rol r on ur.id_rol = r.id_rol;
+
+create view rol_user as select r.nombre_rol
+  from usuario_rol ur
+  join rol r on ur.id_rol = r.id_rol
+  where ur.id_usuario = id_usuario;
 
 -- usuarios sin teléfono 2
 select nombre_completo from usuario where telefono_2 is null;
@@ -39,7 +43,7 @@ group by metodo_pago;
 -- solo los nombres de los usuarios
 select nombre_completo from usuario;
 
-use codegol;
+
 /*Vistas*/
 create view vista_asistencia_con_nombres as
 select 
@@ -290,4 +294,3 @@ begin
 end //
 
 delimiter ;
-

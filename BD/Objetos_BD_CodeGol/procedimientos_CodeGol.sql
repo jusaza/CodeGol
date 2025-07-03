@@ -1,195 +1,319 @@
 delimiter //
 
--- devuelve todos los usuarios
-create procedure proc_usuarios()
-begin
-  select * from usuario;
-end;
-//
-
--- devuelve todos los roles
-create procedure proc_roles()
-begin
-  select * from rol;
-end;
-//
-
--- inserta un artículo nuevo
-create procedure proc_insertar_articulo(in nombre varchar(255), in cantidad int)
-begin
-  insert into inventario(nombre_articulo, cantidad_total, fecha_ingreso, estado)
-  values(nombre, cantidad, curdate(), 'activo');
-end;
-//
-
--- inserta un pago
-create procedure proc_insertar_pago(in concepto varchar(255), in valor int)
-begin
-  insert into pago(concepto_pago, fecha_pago, metodo_pago, valor_total, pagado_por, id_matricula)
-  values(concepto, curdate(), 'efectivo', valor, 1, 1);
-end;
-//
-
--- busca artículos por nombre
-create procedure proc_buscar_articulo(in nombre varchar(255))
-begin
-  select * from inventario where nombre_articulo like concat('%', nombre, '%');
-end;
-//
-
--- asigna un rol a un usuario
-create procedure proc_asignar_rol(in id_usuario int, in id_rol int)
-begin
-  insert into usuario_rol(id_usuario, id_rol) values(id_usuario, id_rol);
-end;
-//
-
--- muestra los usos registrados por usuario
-create procedure proc_usos_por_usuario(in id int)
-begin
-  select * from uso_detalle where id_entrenador = id;
-end;
-//
-
--- muestra pagos según una fecha
-create procedure proc_pagos_por_fecha(in fecha date)
-begin
-  select * from pago where fecha_pago = fecha;
-end;
-//
-
--- cambia el estado de un usuario
-create procedure proc_cambiar_estado(in id int, in nuevo_estado varchar(10))
-begin
-  update usuario set estado = nuevo_estado where id_usuario = id;
-end;
-//
-
--- muestra los roles que tiene un usuario
-create procedure proc_roles_de_usuario(in id_usuario int)
-begin
-  select r.nombre_rol
-  from usuario_rol ur
-  join rol r on ur.id_rol = r.id_rol
-  where ur.id_usuario = id_usuario;
-end;
-//
-
-delimiter ;
-
-use codegol;
-/*Procedimiento*/
-/*-------Detalle asiste-------*/
-/*-----Registrar-----*/
-delimiter //
-
-create procedure registrar_asistencia(
-    in p_tipo_asistencia varchar(20),
-    in p_justificacion varchar(100),
-    in p_observaciones varchar(100),
-    in p_id_jugador tinyint,
-    in p_id_entrenamiento tinyint
+-- =========================
+-- ===== TABLA: USUARIO ===
+-- =========================
+create procedure registrar_usuario(
+  in correo varchar(60),
+  in nombre_completo varchar(60),
+  in num_identificacion int unsigned,
+  in tipo_documento enum('cc','ti','ce','pa','rc','pep','nit','nuip','dni','ppt'),
+  in telefono_1 bigint unsigned,
+  in telefono_2 bigint unsigned,
+  in direccion varchar(50),
+  in genero enum('m','f','otro'),
+  in fecha_nacimiento date,
+  in lugar_nacimiento varchar(50),
+  in grupo_sanguineo enum('a+','a-','b+','b-','ab+','ab-','o+','o-'),
+  in foto_perfil blob,
+  in registrado_por tinyint unsigned,
+  in id_responsable tinyint unsigned
 )
 begin
-    insert into detalles_asiste(
-        tipo_asistencia, justificacion, observaciones, id_jugador, id_entrenamiento
-    )
-    values (
-        p_tipo_asistencia, p_justificacion, p_observaciones, p_id_jugador, p_id_entrenamiento
-    );
+declare contrasena varchar(60);
+  insert into usuario (
+    correo, contrasena, nombre_completo, num_identificacion, tipo_documento,
+    telefono_1, telefono_2, direccion, genero, fecha_nacimiento, lugar_nacimiento,
+    grupo_sanguineo, foto_perfil, registrado_por, id_responsable
+  ) values (
+    correo, contrasena, nombre_completo, num_identificacion, tipo_documento,
+    telefono_1, telefono_2, direccion, genero, fecha_nacimiento, lugar_nacimiento,
+    grupo_sanguineo, foto_perfil, registrado_por, id_responsable
+  );
 end //
 
-delimiter ;
 
-
-/*-------Actualizar--------*/
+create procedure proc_cambiar_estado(
+  in id tinyint,
+  in nuevo_estado enum('activo','inactivo')
+)
+begin
+  update usuario
+  set estado = nuevo_estado
+  where id_usuario = id;
+end //
 
 delimiter //
+
+create procedure actualizar_usuario(
+  in id_usuario_in tinyint unsigned,
+  in correo varchar(60),
+  in nombre_completo varchar(60),
+  in num_identificacion int unsigned,
+  in tipo_documento enum('cc','ti','ce','pa','rc','pep','nit','nuip','dni','ppt'),
+  in telefono_1 bigint unsigned,
+  in telefono_2 bigint unsigned,
+  in direccion varchar(50),
+  in genero enum('m','f','otro'),
+  in fecha_nacimiento date,
+  in lugar_nacimiento varchar(50),
+  in grupo_sanguineo enum('a+','a-','b+','b-','ab+','ab-','o+','o-'),
+  in foto_perfil blob,
+  in registrado_por tinyint unsigned,
+  in id_responsable tinyint unsigned
+)
+begin
+  update usuario
+  set
+    correo = correo,
+    nombre_completo = nombre_completo,
+    num_identificacion = num_identificacion,
+    tipo_documento = tipo_documento,
+    telefono_1 = telefono_1,
+    telefono_2 = telefono_2,
+    direccion = direccion,
+    genero = genero,
+    fecha_nacimiento = fecha_nacimiento,
+    lugar_nacimiento = lugar_nacimiento,
+    grupo_sanguineo = grupo_sanguineo,
+    foto_perfil = foto_perfil,
+    registrado_por = registrado_por,
+    id_responsable = id_responsable
+  where id_usuario = id_usuario_in;
+end //
+
+
+create procedure proc_cambiar_contrasena(
+  in id tinyint,
+  in nueva_contrasena varchar(60)
+)
+begin
+  update usuario
+  set contrasena = nueva_contrasena
+  where id_usuario = id;
+end //
+
+
+-- =========================
+-- ===== TABLA: ROL =======
+-- =========================
+create procedure proc_registrar_rol (
+  in rol_usuario enum("Administrador","Entrenador","Responsable","Jugador")
+)
+begin
+  insert into rol (rol_usuario) values 
+		('Administrador'),
+		('Entrenador'),
+		('Responsable'),
+		('Jugador');
+end //
+
+create procedure proc_asignar_rol(
+  in id_usuario int,
+  in id_rol int
+)
+begin
+  insert into detalles_usuario_rol (id_usuario, id_rol)
+  values (id_usuario, id_rol);
+end //
+
+-- =============================
+-- ===== TABLA: INVENTARIO ====
+-- =============================
+create procedure proc_insertar_articulo(
+  in nombre varchar(50),
+  in cantidad tinyint,
+  in descripcion varchar(100)
+)
+begin
+  insert into inventario (
+    nombre_articulo, cantidad_total, descripcion, fecha_ingreso
+  ) values (
+    nombre, cantidad, descripcion, curdate()
+  );
+end //
+
+create procedure proc_usar_articulo(
+  in cantidad tinyint,
+  in hora_inicio time,
+  in hora_fin time,
+  in observaciones varchar(100),
+  in id_entrenador tinyint unsigned,
+  in id_inventario tinyint unsigned
+)
+begin
+  insert into detalles_utiliza (
+    cantidad_usada, hora_inicio, hora_fin, observaciones,
+    id_entrenador, id_inventario
+  ) values (
+    cantidad, hora_inicio, hora_fin, observaciones,
+    id_entrenador, id_inventario
+  );
+
+  update inventario
+  set cantidad_total = cantidad_total - cantidad
+  where id_inventario = id_inventario;
+end //
+
+-- =============================
+-- ===== TABLA: ENTRENAMIENTO ====
+-- =============================
+-- Registrar entrenamiento
+create procedure registrar_entrenamiento(
+  in descripcion varchar(100),
+  in fecha date,
+  in hora_inicio time,
+  in hora_fin time,
+  in lugar varchar(50),
+  in observaciones varchar(100),
+  in registrado_por tinyint
+)
+begin
+  insert into entrenamiento(
+    descripcion, fecha, hora_inicio, hora_fin, lugar, estado, observaciones, registrado_por
+  )
+  values (
+    descripcion, fecha, hora_inicio, hora_fin, lugar, 'activo', observaciones, registrado_por
+  );
+end //
+
+-- Actualizar entrenamiento
+create procedure actualizar_entrenamiento(
+  in id_entrenamiento tinyint,
+  in descripcion varchar(100),
+  in fecha date,
+  in hora_inicio time,
+  in hora_fin time,
+  in lugar varchar(50),
+  in observaciones varchar(100)
+)
+begin
+  if exists (
+    select 1 from entrenamiento where id_entrenamiento = id_entrenamiento
+  ) then
+    update entrenamiento
+    set 
+      descripcion = descripcion,
+      fecha = fecha,
+      hora_inicio = hora_inicio,
+      hora_fin = hora_fin,
+      lugar = lugar,
+      observaciones = observaciones
+    where id_entrenamiento = id_entrenamiento;
+  end if;
+end //
+
+-- Eliminar entrenamiento (cambio de estado)
+create procedure eliminar_entrenamiento(
+  in id_entrenamiento tinyint
+)
+begin
+  update entrenamiento
+  set estado = 'inactivo'
+  where id_entrenamiento = id_entrenamiento;
+end //
+
+
+-- =========================
+-- ===== TABLA: MATRICULA ===
+-- =========================
+create procedure proc_registrar_matricula(
+  in fecha_inicio date,
+  in fecha_fin date,
+  in observaciones varchar(100),
+  in id_jugador tinyint unsigned,
+  in registrado_por tinyint unsigned
+)
+begin
+  insert into matricula (
+    fecha_inicio, fecha_fin, estado, observaciones,
+    id_jugador, registrado_por
+  ) values (
+    fecha_inicio, fecha_fin, 'activo', observaciones,
+    id_jugador, registrado_por
+  );
+end //
+
+-- =========================
+-- ===== TABLA: PAGO =======
+-- =========================
+create procedure proc_insertar_pago(
+  in concepto varchar(100),
+  in metodo enum('efectivo','transferencia'),
+  in valor bigint,
+  in observaciones varchar(100),
+  in pagado_por tinyint unsigned,
+  in id_matricula tinyint unsigned
+)
+begin
+  insert into pago (
+    concepto_pago, fecha_pago, metodo_pago, valor_total,
+    observaciones, pagado_por, id_matricula
+  ) values (
+    concepto, curdate(), metodo, valor,
+    observaciones, pagado_por, id_matricula
+  );
+end //
+
+-- ===============================
+-- ===== TABLA: RENDIMIENTO =====
+-- ===============================
+create procedure proc_registrar_rendimiento(
+  in posicion varchar(60),
+  in unidad_medida varchar(20),
+  in velocidad tinyint,
+  in potencia_tiro tinyint,
+  in defensa tinyint,
+  in regate tinyint,
+  in pase tinyint,
+  in tecnica tinyint,
+  in observaciones varchar(60),
+  in estado enum('activo','inactivo'),
+  in id_jugador tinyint unsigned,
+  in registrado_por tinyint unsigned
+)
+begin
+  insert into rendimiento (
+    posicion, unidad_medida, velocidad, potencia_tiro, defensa,
+    regate, pase, tecnica, observaciones, estado, id_jugador, registrado_por
+  ) values (
+    posicion, unidad_medida, velocidad, potencia_tiro, defensa,
+    regate, pase, tecnica, observaciones, estado, id_jugador, registrado_por
+  );
+end //
+
+-- ================================
+-- ===== TABLA: DETALLES_ASISTE ===
+-- ================================
+create procedure registrar_asistencia(
+  in tipo_asistencia varchar(20),
+  in justificacion varchar(100),
+  in observaciones varchar(100),
+  in id_jugador tinyint,
+  in id_entrenamiento tinyint
+)
+begin
+  insert into detalles_asiste(
+    tipo_asistencia, justificacion, observaciones, id_jugador, id_entrenamiento
+  )
+  values (
+    tipo_asistencia, justificacion, observaciones, id_jugador, id_entrenamiento
+  );
+end //
 
 create procedure actualizar_asistencia(
-	in p_id_asiste tinyint,
-    in p_tipo_asistencia varchar(20),
-    in p_justificacion varchar(100),
-    in p_observaciones varchar(100)
+  in id_asiste_in tinyint,
+  in tipo_asistencia_in varchar(20),
+  in justificacion_in varchar(100),
+  in observaciones_in varchar(100)
 )
 begin
-    update detalles_asiste
-    set
-        tipo_asistencia = p_tipo_asistencia, 
-        justificacion = p_justificacion, 
-        observaciones = p_observaciones
-    where id_asiste = p_id_asiste;
-end //
-
-delimiter ;
-
-/*---Entrenamiento---*/
-/*Registrar*/
-delimiter //
-
-create procedure registrar_entrenamiento(
-    in p_descripcion varchar(100),
-    in p_fecha date,
-    in p_hora_inicio time,
-    in p_hora_fin time,
-    in p_lugar varchar(50),
-    in p_observaciones varchar(100),
-    in p_registrado_por tinyint
-)
-begin
-    insert into entrenamiento(
-        descripcion, fecha, hora_inicio, hora_fin, lugar, estado, observaciones, registrado_por
-    )
-    values (
-        p_descripcion, p_fecha, p_hora_inicio, p_hora_fin, p_lugar, 'activo', p_observaciones, p_registrado_por
-    );
-end //
-
-delimiter ;
-
-
-
-/*Actualizar*/
-delimiter //
-
-create procedure actualizar_entrenamiento(
-    in p_id_entrenamiento tinyint,
-    in p_descripcion varchar(100),
-    in p_fecha date,
-    in p_hora_inicio time,
-    in p_hora_fin time,
-    in p_lugar varchar(50),
-    in p_observaciones varchar(100)
-)
-begin
-    if exists (
-        select 1 from entrenamiento where id_entrenamiento = p_id_entrenamiento
-    ) then
-        update entrenamiento
-        set 
-            descripcion = p_descripcion,
-            fecha = p_fecha,
-            hora_inicio = p_hora_inicio,
-            hora_fin = p_hora_fin,
-            lugar = p_lugar,
-            observaciones = p_observaciones
-        where id_entrenamiento = p_id_entrenamiento;
-    end if;
-end //
-
-delimiter ;
-
-
-/*Elminar*/
-delimiter //
-
-create procedure eliminar_entrenamiento(
-    in p_id_entrenamiento tinyint
-)
-begin
-    update entrenamiento
-    set estado = 'inactivo'
-    where id_entrenamiento = p_id_entrenamiento;
+  update detalles_asiste
+  set
+    tipo_asistencia = tipo_asistencia_in, 
+    justificacion = justificacion_in, 
+    observaciones = observaciones_in
+  where id_asiste = id_asiste_in;
 end //
 
 delimiter ;
@@ -345,3 +469,4 @@ begin
 end //
 
 delimiter ;
+
