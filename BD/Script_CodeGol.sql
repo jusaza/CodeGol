@@ -19,10 +19,10 @@ create table usuario (
   lugar_nacimiento varchar(50) null comment 'ciudad o país de nacimiento',
   grupo_sanguineo enum('a+','a-','b+','b-','ab+','ab-','o+','o-') not null comment 'tipo de sangre',
   foto_perfil blob default null comment 'imagen del perfil del usuario',
-  estado enum('activo','inactivo') not null default 'activo' comment 'estado del usuario',
-  registrado_por tinyint unsigned not null default 1 comment 'id del usuario que lo registró',
-  id_responsable tinyint unsigned not null comment 'id del responsable del usuario',
-  constraint fk_usuario_registrado_por foreign key (registrado_por) references usuario (id_usuario),
+  estado boolean not null default true comment 'estado del usuario',
+  id_usuario_registro tinyint unsigned not null default 1 comment 'id del usuario que lo registró',
+  id_responsable tinyint unsigned not null comment 'id del responsable del usuario (jugador)',
+  constraint fk_usuario_registrado_por foreign key (id_usuario_registro) references usuario (id_usuario),
   constraint fk_useresponsable foreign key (id_responsable) references usuario (id_usuario)
 );
 
@@ -39,7 +39,9 @@ create table inventario (
   cantidad_total tinyint unsigned not null comment 'cantidad total disponible',
   descripcion varchar(100) null comment 'detalle adicional del artículo',
   fecha_ingreso date not null comment 'fecha en que se registró el artículo',
-  estado enum('activo','inactivo') not null default 'activo' comment 'estado del artículo'
+  estado boolean not null default true comment 'estado del articulo',
+  id_usuario tinyint unsigned not null comment 'usuario que registró el articulo',
+  constraint fk_inveregistrado foreign key (id_usuario) references usuario (id_usuario)
 );
 
 -- tabla: entrenamiento
@@ -51,9 +53,9 @@ create table entrenamiento (
   hora_fin time not null comment 'hora de finalización',
   lugar varchar(50) not null comment 'lugar donde se realiza',
   observaciones varchar(100) null comment 'notas u observaciones',
-  estado enum('activo','inactivo') not null default 'activo' comment 'estado del entrenamiento',
-  registrado_por tinyint unsigned not null comment 'usuario que registró el entrenamiento',
-  constraint fk_entreregistrado foreign key (registrado_por) references usuario (id_usuario)
+  estado boolean not null default true comment 'estado del entrenamiento',
+  id_usuario tinyint unsigned not null comment 'usuario que registró el entrenamiento',
+  constraint fk_entreregistrado foreign key (id_usuario ) references usuario (id_usuario)
 );
 
 -- tabla: matricula
@@ -62,12 +64,14 @@ create table matricula (
   fecha_matricula date default current_timestamp not null comment 'fecha en que se hizo la matrícula',
   fecha_inicio date not null comment 'fecha de inicio del proceso',
   fecha_fin date not null comment 'fecha de finalización',
-  estado enum('activo','inactivo') not null default 'activo' comment 'estado de la matrícula',
+  estado boolean not null default true comment 'estado de la matricula',
   observaciones varchar(100) null comment 'notas u observaciones',
+  categoria tinyint not null comment 'categoria a la que pertenece el jugador matriculado',
+  nivel enum('Bajo','Medio','Alto') not null comment 'nivel a la que pertenece el jugador matriculado',
   id_jugador tinyint unsigned not null comment 'usuario matriculado',
-  registrado_por tinyint unsigned not null comment 'usuario que hizo el registro',
+  id_usuario  tinyint unsigned not null comment 'usuario que hizo el registro',
   constraint lf_usermatricula foreign key (id_jugador) references usuario (id_usuario),
-  constraint lf_regmatricula foreign key (registrado_por) references usuario (id_usuario)
+  constraint lf_regmatricula foreign key (id_usuario) references usuario (id_usuario)
 );
 
 -- tabla: pago
@@ -78,9 +82,12 @@ create table pago (
   metodo_pago enum('efectivo','transferencia') not null comment 'método utilizado para el pago',
   valor_total bigint unsigned not null comment 'valor total pagado',
   observaciones varchar(100) null comment 'notas adicionales del pago',
-  pagado_por tinyint unsigned not null comment 'usuario que realizó el pago',
+  estado boolean not null default false comment 'estado del pago',
+  id_usuario tinyint unsigned not null comment 'usuario que registro el pago',
+  id_responsable tinyint unsigned not null comment 'usuario que realizo el pago',
   id_matricula tinyint unsigned not null comment 'matrícula relacionada al pago',
-  constraint lf_userpago foreign key (pagado_por) references usuario (id_usuario),
+  constraint lf_userpago foreign key (id_usuario ) references usuario (id_usuario),
+  constraint lf_userrespo foreign key (id_responsable ) references usuario (id_usuario),
   constraint lf_matricula foreign key (id_matricula) references matricula (id_matricula)
 );
 
@@ -98,11 +105,11 @@ create table rendimiento (
   tecnica tinyint not null comment 'valor de técnica',
   promedio decimal(5,2) generated always as ((velocidad + potencia_tiro + defensa + regate + pase + tecnica) / 6) stored comment 'promedio general del jugador',
   observaciones varchar(60) null comment 'notas adicionales',
-  estado enum('activo','inactivo') not null comment 'estado de la evaluación',
-  id_jugador tinyint unsigned not null comment 'jugador evaluado',
-  registrado_por tinyint unsigned not null comment 'usuario que hizo la evaluación',
-  constraint lf_userendi foreign key (id_jugador) references usuario (id_usuario),
-  constraint lf_regrendi foreign key (registrado_por) references usuario (id_usuario)
+  estado boolean not null default true comment 'estado del rendimiento',
+  id_matricula tinyint unsigned not null comment 'jugador evaluado',
+  id_usuario tinyint unsigned not null comment 'usuario que hizo la evaluación',
+  constraint lf_userendi foreign key (id_matricula) references matricula (id_matricula),
+  constraint lf_regrendi foreign key (id_usuario) references usuario (id_usuario)
 );
 
 -- tabla: detalles_usuario_rol
@@ -116,14 +123,11 @@ create table detalles_usuario_rol (
 -- tabla: detalles_utiliza
 create table detalles_utiliza (
   id_utiliza tinyint unsigned auto_increment primary key comment 'identificador del uso de inventario',
-  fecha_uso date default current_timestamp not null comment 'fecha en que se usó el artículo',
   cantidad_usada tinyint not null comment 'cantidad utilizada del artículo',
-  hora_inicio time not null comment 'hora de inicio del uso',
-  hora_fin time not null comment 'hora de finalización del uso',
   observaciones varchar(100) null comment 'notas u observaciones',
-  id_entrenador tinyint unsigned not null comment 'usuario que usó el artículo',
+  id_entrenamiento tinyint unsigned not null comment 'usuario que usó el artículo',
   id_inventario tinyint unsigned not null comment 'artículo usado',
-  constraint lf_utilientrenador foreign key (id_entrenador) references usuario (id_usuario),
+  constraint lf_utilientrenador foreign key (id_entrenamiento) references entrenamiento (id_entrenamiento),
   constraint lf_articulo foreign key (id_inventario) references inventario (id_inventario)
 );
 
@@ -133,8 +137,8 @@ create table detalles_asiste (
   tipo_asistencia enum('asiste','inasiste','llegada tarde') not null comment 'tipo de asistencia registrada',
   justificacion varchar(100) default null comment 'explicación si no asistió o llegó tarde',
   observaciones varchar(100) null comment 'notas u observaciones',
-  id_jugador tinyint unsigned not null comment 'jugador que asistió o no',
+  id_matricula tinyint unsigned not null comment 'jugador que asistió o no',
   id_entrenamiento tinyint unsigned not null comment 'entrenamiento relacionado',
-  constraint lf_asisjugador foreign key (id_jugador) references usuario (id_usuario),
+  constraint lf_asisjugador foreign key (id_matricula) references matricula (id_matricula),
   constraint lf_asisentrena foreign key (id_entrenamiento) references entrenamiento(id_entrenamiento)
 );
