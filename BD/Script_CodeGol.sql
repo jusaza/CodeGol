@@ -21,7 +21,7 @@ create table usuario (
   foto_perfil blob default null comment 'imagen del perfil del usuario',
   estado boolean not null default true comment 'estado del usuario',
   id_usuario_registro tinyint unsigned not null default 1 comment 'id del usuario que lo registró',
-  id_responsable tinyint unsigned not null comment 'id del responsable del usuario (jugador)',
+  id_responsable tinyint unsigned null comment 'id del responsable del usuario (jugador)',
   constraint fk_usuario_registrado_por foreign key (id_usuario_registro) references usuario (id_usuario),
   constraint fk_useresponsable foreign key (id_responsable) references usuario (id_usuario)
 );
@@ -79,7 +79,7 @@ create table pago (
   id_pago tinyint unsigned auto_increment primary key comment 'identificador del pago',
   concepto_pago varchar(100) not null comment 'concepto o motivo del pago',
   fecha_pago date default current_timestamp not null comment 'fecha en que se realizó el pago',
-  metodo_pago enum('efectivo','transferencia') not null comment 'método utilizado para el pago',
+  metodo_pago enum('efectivo','transferencia') null comment 'método utilizado para el pago',
   valor_total bigint unsigned not null comment 'valor total pagado',
   observaciones varchar(100) null comment 'notas adicionales del pago',
   estado boolean not null default false comment 'estado del pago',

@@ -1,132 +1,146 @@
--- usuarios activos
-select * from usuario where estado = 'activo';
-
--- entrenadores con correo
-select u.nombre_completo, u.correo
-from usuario u
-join usuario_rol ur on u.id_usuario = ur.id_usuario
-join rol r on ur.id_rol = r.id_rol
-where r.nombre_rol = 'entrenador';
-
--- artículos activos
-select * from inventario where estado = 'activo';
-
-select * from inventario where nombre_articulo like concat('%', nombre, '%');
-
--- pagos realizados por el usuario 1
-select * from pago where pagado_por = 1;
-
-select * from pago where fecha_pago = fecha;
-
--- roles asignados por usuario
-select u.nombre_completo, r.nombre_rol
-from usuario u
-join usuario_rol ur on u.id_usuario = ur.id_usuario
-join rol r on ur.id_rol = r.id_rol;
-
-create view rol_user as select r.nombre_rol
-  from usuario_rol ur
-  join rol r on ur.id_rol = r.id_rol
-  where ur.id_usuario = id_usuario;
-
--- usuarios sin teléfono 2
-select nombre_completo from usuario where telefono_2 is null;
-
--- artículos con menos de 5 unidades
-select * from inventario where cantidad_total < 5;
-
--- cantidad de pagos por método
-select metodo_pago, count(*) as cantidad
-from pago
-group by metodo_pago;
-
--- solo los nombres de los usuarios
-select nombre_completo from usuario;
-
 
 /*Vistas*/
-create view vista_asistencia_con_nombres as
+create or replace view vista_asistencia_con_nombres as
 select 
-    detalles_asiste.id_asiste,
-    usuario.nombre_completo as nombre_jugador,
-    detalles_asiste.tipo_asistencia,
-    detalles_asiste.justificacion,
-    detalles_asiste.observaciones,
-    entrenamiento.fecha as fecha_entrenamiento,
-    entrenamiento.descripcion as descripcion_entrenamiento,
-    entrenamiento.estado as estado_entrenamiento
-from detalles_asiste
-join usuario on detalles_asiste.id_jugador = usuario.id_usuario
-join entrenamiento on detalles_asiste.id_entrenamiento = entrenamiento.id_entrenamiento
-where entrenamiento.estado = 'activo'
-order by usuario.nombre_completo asc;
+    da.id_asiste,
+    u.nombre_completo as nombre_jugador,
+    da.tipo_asistencia,
+    da.justificacion,
+    da.observaciones,
+    e.fecha as fecha_entrenamiento,
+    e.descripcion as descripcion_entrenamiento
+from detalles_asiste da
+join matricula m on da.id_matricula = m.id_matricula
+join usuario u on m.id_jugador = u.id_usuario
+join entrenamiento e on da.id_entrenamiento = e.id_entrenamiento
+where e.estado = true
+order by u.nombre_completo asc;
+
 
 /*-------Consulta Especifica-----*/
 
 delimiter //
 
-create procedure consultar_asistencia_por_nombre(
-    in p_nombre_jugador varchar(100)
+create procedure consultar_asistencia_por_nombre_documento(
+    in p_nombre_jugador varchar(100),
+    in p_num_documento varchar(20)
 )
 begin
     select 
-        detalles_asiste.id_asiste,
-        usuario.nombre_completo as nombre_jugador,
-        detalles_asiste.tipo_asistencia,
-        detalles_asiste.justificacion,
-        detalles_asiste.observaciones,
-        entrenamiento.fecha as fecha_entrenamiento,
-        entrenamiento.descripcion as descripcion_entrenamiento,
-        entrenamiento.estado as estado_entrenamiento
-    from detalles_asiste
-    join usuario on detalles_asiste.id_jugador = usuario.id_usuario
-    join entrenamiento on detalles_asiste.id_entrenamiento = entrenamiento.id_entrenamiento
-    where entrenamiento.estado = 'activo'
-      and usuario.nombre_completo like concat('%', p_nombre_jugador, '%')
-    order by usuario.nombre_completo asc;
+        da.id_asiste,
+        u.nombre_completo as nombre_jugador,
+        da.tipo_asistencia,
+        da.justificacion,
+        da.observaciones,
+        e.fecha as fecha_entrenamiento,
+        e.descripcion as descripcion_entrenamiento
+    from detalles_asiste da
+    join matricula m on da.id_matricula = m.id_matricula
+    join usuario u on m.id_jugador = u.id_usuario
+    join entrenamiento e on da.id_entrenamiento = e.id_entrenamiento
+    where e.estado = true
+      and (
+          p_nombre_jugador is null 
+          or p_nombre_jugador = '' 
+          or LOWER(u.nombre_completo) like concat('%', LOWER(p_nombre_jugador), '%')
+      )
+      and (
+          p_num_documento is null
+          or p_num_documento = ''
+          or CAST(u.num_identificacion AS CHAR) like concat('%', p_num_documento, '%')
+      )
+    order by u.nombre_completo asc;
 end //
 
 delimiter ;
 
+
+
 /*------Entrenamiento------*/
-create view vista_entrenamientos_con_responsable as
+create or replace view vista_entrenamientos_con_responsable as
 select 
-    entrenamiento.id_entrenamiento,
-    entrenamiento.descripcion,
-    entrenamiento.fecha,
-    entrenamiento.hora_inicio,
-    entrenamiento.hora_fin,
-    entrenamiento.lugar,
-    entrenamiento.estado,
-    entrenamiento.observaciones,
-    usuario.nombre_completo as nombre_registrador
-from entrenamiento
-join usuario on entrenamiento.registrado_por = usuario.id_usuario
-where entrenamiento.estado = 'activo'
-order by entrenamiento.fecha desc;
+    e.id_entrenamiento,
+    e.descripcion,
+    e.fecha,
+    e.hora_inicio,
+    e.hora_fin,
+    e.lugar,
+    e.observaciones,
+    u.nombre_completo as nombre_registrador,
+    u.num_identificacion as documento_registrador
+from entrenamiento e
+join usuario u on e.id_usuario = u.id_usuario
+where e.estado = true
+order by e.fecha desc;
+
+
 
 /*Consulta Especifica*/
 delimiter //
 
-create procedure consultar_entrenamientos_por_registrador(
-    in p_id_registrador tinyint
+create procedure consultar_entrenamientos_para_registrador(
+    in p_id_usuario tinyint,
+    in p_fecha date
 )
 begin
     select 
-        entrenamiento.id_entrenamiento,
-        entrenamiento.descripcion,
-        entrenamiento.fecha,
-        entrenamiento.hora_inicio,
-        entrenamiento.hora_fin,
-        entrenamiento.lugar,
-        entrenamiento.estado,
-        entrenamiento.observaciones,
-        usuario.nombre_completo as nombre_registrador
-    from entrenamiento
-    join usuario on entrenamiento.registrado_por = usuario.id_usuario
-    where entrenamiento.estado = 'activo'
-      and entrenamiento.registrado_por = p_id_registrador
-    order by entrenamiento.fecha desc;
+        e.id_entrenamiento,
+        e.descripcion,
+        e.fecha,
+        e.hora_inicio,
+        e.hora_fin,
+        e.lugar,
+        e.observaciones,
+        u.nombre_completo as nombre_registrador,
+        u.num_identificacion as documento_registrador
+    from entrenamiento e
+    join usuario u on e.id_usuario = u.id_usuario
+    where e.estado = true
+      and e.id_usuario = p_id_usuario
+      and (
+        p_fecha is null 
+        or e.fecha = p_fecha
+      )
+    order by e.fecha desc;
+end //
+
+delimiter ;
+
+
+/*------------------------------------------*/
+delimiter //
+
+create procedure consultar_entrenamientos_de_jugador(
+    in p_id_jugador tinyint,
+    in p_nombre_registrador varchar(100),
+    in p_fecha date
+)
+begin
+    select 
+        e.id_entrenamiento,
+        e.descripcion,
+        e.fecha,
+        e.hora_inicio,
+        e.hora_fin,
+        e.lugar,
+        e.observaciones,
+        ur.nombre_completo as nombre_registrador,
+        ur.num_identificacion as documento_registrador
+    from detalles_asiste da
+    join matricula m on da.id_matricula = m.id_matricula
+    join entrenamiento e on da.id_entrenamiento = e.id_entrenamiento
+    join usuario ur on e.id_usuario = ur.id_usuario  -- quien registró el entrenamiento
+    where e.estado = true
+      and m.id_jugador = p_id_jugador
+      and (
+        p_fecha is null or e.fecha = p_fecha
+      )
+      and (
+        p_nombre_registrador is null or p_nombre_registrador = '' 
+        or lower(ur.nombre_completo) like concat('%', lower(p_nombre_registrador), '%')
+      )
+    group by e.id_entrenamiento
+    order by e.fecha desc;
 end //
 
 delimiter ;
@@ -134,119 +148,324 @@ delimiter ;
 /*------------------------------------------*/
 delimiter //
 
-create procedure consultar_entrenamientos_por_nombre_registrador(
-    in p_nombre_registrador varchar(100)
+create procedure consultar_entrenamientos_de_mis_jugadores(
+    in p_id_responsable tinyint,
+    in p_nombre_registrador varchar(100),
+    in p_fecha date
 )
 begin
     select 
-        entrenamiento.id_entrenamiento,
-        entrenamiento.descripcion,
-        entrenamiento.fecha,
-        entrenamiento.hora_inicio,
-        entrenamiento.hora_fin,
-        entrenamiento.lugar,
-        entrenamiento.estado,
-        entrenamiento.observaciones,
-        usuario.nombre_completo as nombre_registrador
-    from entrenamiento
-    join usuario on entrenamiento.registrado_por = usuario.id_usuario
-    where entrenamiento.estado = 'activo'
-      and usuario.nombre_completo like concat('%', p_nombre_registrador, '%')
-    order by entrenamiento.fecha desc;
+        e.id_entrenamiento,
+        e.descripcion,
+        e.fecha,
+        e.hora_inicio,
+        e.hora_fin,
+        e.lugar,
+        e.observaciones,
+        ur.nombre_completo as nombre_registrador,
+        ur.num_identificacion as documento_registrador
+    from usuario u
+    join matricula m on u.id_usuario = m.id_jugador
+    join detalles_asiste da on da.id_matricula = m.id_matricula
+    join entrenamiento e on da.id_entrenamiento = e.id_entrenamiento
+    join usuario ur on e.id_usuario = ur.id_usuario -- quien registró el entrenamiento
+    where u.id_responsable = p_id_responsable
+      and e.estado = true
+      and (p_fecha is null or e.fecha = p_fecha)
+      and (
+        p_nombre_registrador is null or p_nombre_registrador = ''
+        or lower(ur.nombre_completo) like concat('%', lower(p_nombre_registrador), '%')
+      )
+    group by e.id_entrenamiento
+    order by e.fecha desc;
 end //
 
 delimiter ;
 
-/*---Rendimiento----.*/
-create view vista_rendimientos as
-select 
-    rendimiento.id_rendimiento,
-    rendimiento.fecha_evaluacion,
-    rendimiento.posicion,
-    rendimiento.unidad_medida,
-    rendimiento.velocidad,
-    rendimiento.potencia_tiro,
-    rendimiento.defensa,
-    rendimiento.regate,
-    rendimiento.pase,
-    rendimiento.tecnica,
-    rendimiento.promedio,
-    rendimiento.observaciones,
-    usuario.nombre_completo as nombre_jugador
-from rendimiento
-join usuario on rendimiento.id_jugador = usuario.id_usuario
-where rendimiento.estado = 'activo'
-order by rendimiento.fecha_evaluacion desc;
 
-/*Consulta Especifica*/
+/*------------------------------------------*/
 delimiter //
 
-create procedure consultar_rendimientos_por_nombre_jugador(
-    in p_nombre_jugador varchar(100)
+create procedure consultar_entrenamientos_por_documento_y_opcional(
+    in p_num_identificacion int,
+    in p_nombre_registrador varchar(100),
+    in p_fecha date
 )
 begin
     select 
-        rendimiento.id_rendimiento,
-        rendimiento.fecha_evaluacion,
-        rendimiento.posicion,
-        rendimiento.unidad_medida,
-        rendimiento.velocidad,
-        rendimiento.potencia_tiro,
-        rendimiento.defensa,
-        rendimiento.regate,
-        rendimiento.pase,
-        rendimiento.tecnica,
-        rendimiento.promedio,
-        rendimiento.observaciones,
-        usuario.nombre_completo as nombre_jugador
-    from rendimiento
-    join usuario on rendimiento.id_jugador = usuario.id_usuario
-    where rendimiento.estado = 'activo'
-      and usuario.nombre_completo like concat('%', p_nombre_jugador, '%')
-    order by rendimiento.fecha_evaluacion desc;
+        e.id_entrenamiento,
+        e.descripcion,
+        e.fecha,
+        e.hora_inicio,
+        e.hora_fin,
+        e.lugar,
+        e.observaciones,
+        u.nombre_completo as nombre_registrador,
+        u.num_identificacion
+    from entrenamiento e
+    join usuario u on e.id_usuario = u.id_usuario
+    where e.estado = true
+      and u.num_identificacion like concat('%', p_num_identificacion, '%')
+      and (
+        p_nombre_registrador is null 
+        or lower(u.nombre_completo) like concat('%', lower(p_nombre_registrador), '%')
+      )
+      and (
+        p_fecha is null 
+        or e.fecha = p_fecha
+      )
+    order by e.fecha desc;
 end //
 
 delimiter ;
+
+
+
+/*-----------------*/
+
+create or replace view vista_rendimientos as
+select 
+    r.id_rendimiento,
+    r.fecha_evaluacion,
+    r.posicion,
+    r.unidad_medida,
+    r.velocidad,
+    r.potencia_tiro,
+    r.defensa,
+    r.regate,
+    r.pase,
+    r.tecnica,
+    r.promedio,
+    r.observaciones,
+    u.nombre_completo as nombre_jugador,
+    u.num_identificacion as documento_jugador,
+    ur.nombre_completo as registrado_por,
+    ur.num_identificacion as documento_registrador
+from rendimiento r
+join matricula m on r.id_matricula = m.id_matricula
+join usuario u on m.id_jugador = u.id_usuario         -- Jugador evaluado
+join usuario ur on r.id_usuario = ur.id_usuario       -- Usuario que registró
+where r.estado = true
+order by r.fecha_evaluacion desc;
+
+/*Consulta Espesifica*/
+
+delimiter //
+
+create procedure consultar_rendimientos_por_nombre_o_documento(
+    in p_nombre_jugador varchar(100),
+    in p_num_documento varchar(20)  -- para búsqueda parcial
+)
+begin
+    select 
+        r.id_rendimiento,
+        r.fecha_evaluacion,
+        r.posicion,
+        r.unidad_medida,
+        r.velocidad,
+        r.potencia_tiro,
+        r.defensa,
+        r.regate,
+        r.pase,
+        r.tecnica,
+        r.promedio,
+        r.observaciones,
+        u.nombre_completo as nombre_jugador,
+        u.num_identificacion as numero_documento,
+        ur.nombre_completo as registrado_por,
+        ur.num_identificacion as documento_registrador
+    from rendimiento r
+    join matricula m on r.id_matricula = m.id_matricula
+    join usuario u on m.id_jugador = u.id_usuario
+    join usuario ur on r.id_usuario = ur.id_usuario  -- quien registró el rendimiento
+    where r.estado = true
+      and (
+        (p_nombre_jugador is null or p_nombre_jugador = '' 
+         or lower(u.nombre_completo) like concat('%', lower(p_nombre_jugador), '%'))
+        and
+        (p_num_documento is null or p_num_documento = '' 
+         or cast(u.num_identificacion as char) like concat('%', p_num_documento, '%'))
+      )
+    order by r.fecha_evaluacion desc;
+end //
+
+delimiter ;
+
+delimiter //
+
+create procedure consultar_rendimientos_por_registrador(
+    in p_id_registrador tinyint,
+    in p_nombre_jugador varchar(100),
+    in p_num_documento varchar(20)
+)
+begin
+    select 
+        r.id_rendimiento,
+        r.fecha_evaluacion,
+        r.posicion,
+        r.unidad_medida,
+        r.velocidad,
+        r.potencia_tiro,
+        r.defensa,
+        r.regate,
+        r.pase,
+        r.tecnica,
+        r.promedio,
+        r.observaciones,
+        u.nombre_completo as nombre_jugador,
+        u.num_identificacion as numero_documento,
+        ur.nombre_completo as registrado_por,
+        ur.num_identificacion as documento_registrador
+    from rendimiento r
+    join matricula m on r.id_matricula = m.id_matricula
+    join usuario u on m.id_jugador = u.id_usuario
+    join usuario ur on r.id_usuario = ur.id_usuario
+    where r.estado = true
+      and r.id_usuario = p_id_registrador
+      and (
+        (p_nombre_jugador is null or p_nombre_jugador = '' 
+         or lower(u.nombre_completo) like concat('%', lower(p_nombre_jugador), '%'))
+        and
+        (p_num_documento is null or p_num_documento = '' 
+         or cast(u.num_identificacion as char) like concat('%', p_num_documento, '%'))
+      )
+    order by r.fecha_evaluacion desc;
+end //
+
+delimiter ;
+
+delimiter //
+
+create procedure consultar_rendimientos_para_jugador(
+    in p_id_jugador tinyint,
+    in p_fecha date
+)
+begin
+    select 
+        r.id_rendimiento,
+        r.fecha_evaluacion,
+        r.posicion,
+        r.unidad_medida,
+        r.velocidad,
+        r.potencia_tiro,
+        r.defensa,
+        r.regate,
+        r.pase,
+        r.tecnica,
+        r.promedio,
+        r.observaciones,
+        u.nombre_completo as nombre_jugador,
+        u.num_identificacion as numero_documento,
+        ur.nombre_completo as registrado_por,
+        ur.num_identificacion as documento_registrador
+    from rendimiento r
+    join matricula m on r.id_matricula = m.id_matricula
+    join usuario u on m.id_jugador = u.id_usuario
+    join usuario ur on r.id_usuario = ur.id_usuario
+    where r.estado = true
+      and u.id_usuario = p_id_jugador
+      and (p_fecha is null or r.fecha_evaluacion = p_fecha)
+    order by r.fecha_evaluacion desc;
+end //
+
+delimiter ;
+
+delimiter //
+
+create procedure consultar_rendimientos_de_mis_jugadores(
+    in p_id_responsable tinyint,
+    in p_fecha date
+)
+begin
+    select 
+        r.id_rendimiento,
+        r.fecha_evaluacion,
+        r.posicion,
+        r.unidad_medida,
+        r.velocidad,
+        r.potencia_tiro,
+        r.defensa,
+        r.regate,
+        r.pase,
+        r.tecnica,
+        r.promedio,
+        r.observaciones,
+        u.nombre_completo as nombre_jugador,
+        u.num_identificacion as numero_documento,
+        ur.nombre_completo as registrado_por,
+        ur.num_identificacion as documento_registrador
+    from usuario u
+    join matricula m on u.id_usuario = m.id_jugador
+    join rendimiento r on r.id_matricula = m.id_matricula
+    join usuario ur on r.id_usuario = ur.id_usuario
+    where u.id_responsable = p_id_responsable
+      and r.estado = true
+      and (p_fecha is null or r.fecha_evaluacion = p_fecha)
+    order by r.fecha_evaluacion desc;
+end //
+
+delimiter ;
+
+
 
 /*---Matricula----.*/
-create view vista_matriculas as
+create or replace view vista_matriculas as
 select 
-    matricula.id_matricula,
-    matricula.fecha_matricula,
-    matricula.fecha_inicio,
-    matricula.fecha_fin,
-    matricula.estado,
-    matricula.observaciones,
-    usuario.nombre_completo as nombre_jugador
-from matricula
-join usuario on matricula.id_jugador = usuario.id_usuario
-where matricula.estado = 'activo'
-order by matricula.fecha_matricula desc;
+    m.id_matricula,
+    m.fecha_matricula,
+    m.fecha_inicio,
+    m.fecha_fin,
+    m.estado,
+    m.observaciones,
+    uj.nombre_completo as nombre_jugador,
+    uj.num_identificacion as documento_jugador,
+    ur.nombre_completo as registrado_por,
+    ur.num_identificacion as documento_registrador
+from matricula m
+join usuario uj on m.id_jugador = uj.id_usuario
+join usuario ur on m.id_usuario = ur.id_usuario
+where m.estado = true
+order by m.fecha_matricula desc;
+
+
 
 /*Consulta Especifica*/
 
 delimiter //
 
-create procedure consultar_matriculas_por_nombre(
-    in p_nombre_jugador varchar(100)
+create procedure consultar_matriculas_por_nombre_o_documento(
+    in p_nombre_jugador varchar(100),
+    in p_num_documento varchar(20)  -- CAMBIADO a varchar para permitir búsqueda parcial
 )
 begin
     select 
-        matricula.id_matricula,
-        matricula.fecha_matricula,
-        matricula.fecha_inicio,
-        matricula.fecha_fin,
-        matricula.estado,
-        matricula.observaciones,
-        usuario.nombre_completo as nombre_jugador
-    from matricula
-    join usuario on matricula.id_jugador = usuario.id_usuario
-    where matricula.estado = 'activo'
-      and usuario.nombre_completo like concat('%', p_nombre_jugador, '%')
-    order by matricula.fecha_matricula desc;
+        m.id_matricula,
+        m.fecha_matricula,
+        m.fecha_inicio,
+        m.fecha_fin,
+        m.estado,
+        m.observaciones,
+        u.nombre_completo as nombre_jugador,
+        u.num_identificacion as documento_jugador,
+        ur.nombre_completo as registrado_por,
+        ur.num_identificacion as documento_registrador
+    from matricula m
+    join usuario u on m.id_jugador = u.id_usuario
+    join usuario ur on m.id_usuario = ur.id_usuario
+    where m.estado = true
+      and (
+            p_nombre_jugador is null or p_nombre_jugador = '' 
+            or lower(u.nombre_completo) like concat('%', lower(p_nombre_jugador), '%')
+          )
+      and (
+            p_num_documento is null or p_num_documento = '' 
+            or cast(u.num_identificacion as char) like concat('%', p_num_documento, '%')
+          )
+    order by m.fecha_matricula desc;
 end //
 
 delimiter ;
+
 
 /*--------------------------------*/
 delimiter //
@@ -256,20 +475,26 @@ create procedure consultar_mi_matricula(
 )
 begin
     select 
-        matricula.id_matricula,
-        matricula.fecha_matricula,
-        matricula.fecha_inicio,
-        matricula.fecha_fin,
-        matricula.estado,
-        matricula.observaciones,
-        usuario.nombre_completo as nombre_jugador
-    from matricula
-    join usuario on matricula.id_jugador = usuario.id_usuario
-    where matricula.estado = 'activo'
-      and matricula.id_jugador = p_id_jugador;
+        m.id_matricula,
+        m.fecha_matricula,
+        m.fecha_inicio,
+        m.fecha_fin,
+        m.estado,
+        m.observaciones,
+        u.nombre_completo as nombre_jugador,
+        u.num_identificacion as documento_jugador,
+        ur.nombre_completo as registrado_por,
+        ur.num_identificacion as documento_registrador
+    from matricula m
+    join usuario u on m.id_jugador = u.id_usuario
+    join usuario ur on m.id_usuario = ur.id_usuario
+    where m.estado = true
+      and m.id_jugador = p_id_jugador;
 end //
 
 delimiter ;
+
+
 
 /*----------------------------------------------------------------*/
 delimiter //
@@ -279,18 +504,24 @@ create procedure consultar_matriculas_de_mis_jugadores(
 )
 begin
     select 
-        matricula.id_matricula,
-        matricula.fecha_matricula,
-        matricula.fecha_inicio,
-        matricula.fecha_fin,
-        matricula.estado,
-        matricula.observaciones,
-        usuario.nombre_completo as nombre_jugador
-    from matricula
-    join usuario on matricula.id_jugador = usuario.id_usuario
-    where matricula.estado = 'activo'
-      and usuario.id_responsable = p_id_responsable
-    order by matricula.fecha_matricula desc;
+        m.id_matricula,
+        m.fecha_matricula,
+        m.fecha_inicio,
+        m.fecha_fin,
+        m.estado,
+        m.observaciones,
+        u.nombre_completo as nombre_jugador,
+        u.num_identificacion as documento_jugador,
+        ur.nombre_completo as registrado_por,
+        ur.num_identificacion as documento_registrador
+    from matricula m
+    join usuario u on m.id_jugador = u.id_usuario
+    join usuario ur on m.id_usuario = ur.id_usuario
+    where m.estado = true
+      and u.id_responsable = p_id_responsable
+    order by m.fecha_matricula desc;
 end //
 
 delimiter ;
+
+
