@@ -1,6 +1,6 @@
-
 /*Vistas*/
-create or replace view vista_asistencia_con_nombres as
+
+create view vista_asistencia_con_nombres as
 select 
     da.id_asiste,
     u.nombre_completo as nombre_jugador,
@@ -23,7 +23,8 @@ delimiter //
 
 create procedure consultar_asistencia_por_nombre_documento(
     in p_nombre_jugador varchar(100),
-    in p_num_documento varchar(20)
+    in p_num_documento varchar(20),
+    in p_id_entrenamiento tinyint
 )
 begin
     select 
@@ -39,6 +40,7 @@ begin
     join usuario u on m.id_jugador = u.id_usuario
     join entrenamiento e on da.id_entrenamiento = e.id_entrenamiento
     where e.estado = true
+      and e.id_entrenamiento = p_id_entrenamiento
       and (
           p_nombre_jugador is null 
           or p_nombre_jugador = '' 
@@ -55,9 +57,8 @@ end //
 delimiter ;
 
 
-
 /*------Entrenamiento------*/
-create or replace view vista_entrenamientos_con_responsable as
+create view vista_entrenamientos_con_responsable as
 select 
     e.id_entrenamiento,
     e.descripcion,
@@ -71,7 +72,6 @@ from entrenamiento e
 join usuario u on e.id_usuario = u.id_usuario
 where e.estado = true
 order by e.fecha desc;
-
 
 
 /*Consulta Especifica*/
@@ -214,11 +214,10 @@ end //
 
 delimiter ;
 
-
-
 /*-----------------*/
+/*Consulta Especifica*/
 
-create or replace view vista_rendimientos as
+create view vista_rendimientos as
 select 
     r.id_rendimiento,
     r.fecha_evaluacion,
@@ -240,12 +239,10 @@ join usuario ur on r.id_usuario = ur.id_usuario       -- Usuario que registró
 where r.estado = true
 order by r.fecha_evaluacion desc;
 
-/*Consulta Espesifica*/
-
 delimiter //
 
 create procedure consultar_rendimientos_por_nombre_o_documento(
-    in p_nombre_jugador varchar(100),
+    in p_nombre_jugador varchar(60),
     in p_num_documento varchar(20)  -- para búsqueda parcial
 )
 begin
@@ -410,7 +407,6 @@ where m.estado = true
 order by m.fecha_matricula desc;
 
 
-
 /*Consulta Especifica*/
 
 delimiter //
@@ -499,5 +495,3 @@ begin
 end //
 
 delimiter ;
-
-
