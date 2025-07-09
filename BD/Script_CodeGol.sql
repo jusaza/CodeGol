@@ -96,7 +96,6 @@ create table rendimiento (
   id_rendimiento tinyint unsigned auto_increment primary key comment 'identificador del rendimiento',
   fecha_evaluacion date default current_timestamp not null comment 'fecha en que se evaluó',
   posicion varchar(60) not null comment 'posición del jugador evaluado',
-  unidad_medida varchar(20) not null comment 'unidad de medida usada',
   velocidad tinyint not null comment 'valor de velocidad',
   potencia_tiro tinyint not null comment 'valor de potencia de tiro',
   defensa tinyint not null comment 'valor de defensa',
@@ -107,8 +106,10 @@ create table rendimiento (
   observaciones varchar(60) null comment 'notas adicionales',
   estado boolean not null default true comment 'estado del rendimiento',
   id_matricula tinyint unsigned not null comment 'jugador evaluado',
+  id_entrenamiento tinyint unsigned not null comment 'en que entrenamiento se hizo ese rendimiento',
   id_usuario tinyint unsigned not null comment 'usuario que hizo la evaluación',
   constraint lf_userendi foreign key (id_matricula) references matricula (id_matricula),
+  constraint lf_entrenami foreign key (id_entrenamiento) references entrenamiento (id_entrenamiento),
   constraint lf_regrendi foreign key (id_usuario) references usuario (id_usuario)
 );
 

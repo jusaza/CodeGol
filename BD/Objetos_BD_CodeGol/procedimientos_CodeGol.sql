@@ -3,6 +3,30 @@
 -- =========================
 delimiter //
 
+create procedure loginusuario(
+    in p_num_identificacion int unsigned,
+    in p_contrasena varchar(60)
+)
+begin
+    select 
+        u.id_usuario,
+        r.rol_usuario,
+        u.estado
+    from 
+        usuario u
+    inner join 
+        detalles_usuario_rol dur on u.id_usuario = dur.id_usuario
+    inner join 
+        rol r on dur.id_rol = r.id_rol
+    where 
+        u.num_identificacion = p_num_identificacion
+        and u.contrasena = p_contrasena;
+end //
+
+delimiter ;
+
+delimiter //
+
 create procedure registrar_usuario(
   in p_correo varchar(60),
   in p_nombre_completo varchar(60),
@@ -437,18 +461,19 @@ create procedure registrar_rendimiento(
   in p_tecnica tinyint,
   in p_observaciones varchar(60),
   in p_id_matricula tinyint unsigned,
+  in p_id_entrenamiento tinyint unsigned,
   in p_id_usuario tinyint unsigned
 )
 begin
   insert into rendimiento (
     fecha_evaluacion, posicion, unidad_medida,
     velocidad, potencia_tiro, defensa, regate, pase, tecnica,
-    observaciones, id_matricula, id_usuario
+    observaciones, id_matricula, id_entrenamiento, id_usuario
   )
   values (
     p_fecha_evaluacion, p_posicion, p_unidad_medida,
     p_velocidad, p_potencia_tiro, p_defensa, p_regate, p_pase, p_tecnica,
-    p_observaciones, p_id_matricula, p_id_usuario
+    p_observaciones, p_id_matricula, p_id_entrenamiento, p_id_usuario
   );
 end //
 
@@ -461,7 +486,6 @@ create procedure actualizar_rendimiento(
   in p_id_rendimiento tinyint,
   in p_fecha_evaluacion date,
   in p_posicion varchar(60),
-  in p_unidad_medida varchar(20),
   in p_velocidad tinyint,
   in p_potencia_tiro tinyint,
   in p_defensa tinyint,

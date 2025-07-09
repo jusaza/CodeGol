@@ -66,8 +66,7 @@ select
     e.hora_fin,
     e.lugar,
     e.observaciones,
-    u.nombre_completo as nombre_registrador,
-    u.num_identificacion as documento_registrador
+    u.nombre_completo as nombre_registrador
 from entrenamiento e
 join usuario u on e.id_usuario = u.id_usuario
 where e.estado = true
@@ -91,8 +90,7 @@ begin
         e.hora_fin,
         e.lugar,
         e.observaciones,
-        u.nombre_completo as nombre_registrador,
-        u.num_identificacion as documento_registrador
+        u.nombre_completo as nombre_registrador
     from entrenamiento e
     join usuario u on e.id_usuario = u.id_usuario
     where e.estado = true
@@ -124,8 +122,7 @@ begin
         e.hora_fin,
         e.lugar,
         e.observaciones,
-        ur.nombre_completo as nombre_registrador,
-        ur.num_identificacion as documento_registrador
+        ur.nombre_completo as nombre_registrador
     from detalles_asiste da
     join matricula m on da.id_matricula = m.id_matricula
     join entrenamiento e on da.id_entrenamiento = e.id_entrenamiento
@@ -162,8 +159,7 @@ begin
         e.hora_fin,
         e.lugar,
         e.observaciones,
-        ur.nombre_completo as nombre_registrador,
-        ur.num_identificacion as documento_registrador
+        ur.nombre_completo as nombre_registrador
     from usuario u
     join matricula m on u.id_usuario = m.id_jugador
     join detalles_asiste da on da.id_matricula = m.id_matricula
@@ -200,8 +196,7 @@ begin
         e.hora_fin,
         e.lugar,
         e.observaciones,
-        u.nombre_completo as nombre_registrador,
-        u.num_identificacion
+        u.nombre_completo as nombre_registrador
     from entrenamiento e
     join usuario u on e.id_usuario = u.id_usuario
     where e.estado = true
@@ -228,7 +223,6 @@ select
     r.id_rendimiento,
     r.fecha_evaluacion,
     r.posicion,
-    r.unidad_medida,
     r.velocidad,
     r.potencia_tiro,
     r.defensa,
@@ -238,9 +232,7 @@ select
     r.promedio,
     r.observaciones,
     u.nombre_completo as nombre_jugador,
-    u.num_identificacion as documento_jugador,
-    ur.nombre_completo as registrado_por,
-    ur.num_identificacion as documento_registrador
+    ur.nombre_completo as registrado_por
 from rendimiento r
 join matricula m on r.id_matricula = m.id_matricula
 join usuario u on m.id_jugador = u.id_usuario         -- Jugador evaluado
@@ -271,9 +263,7 @@ begin
         r.promedio,
         r.observaciones,
         u.nombre_completo as nombre_jugador,
-        u.num_identificacion as numero_documento,
-        ur.nombre_completo as registrado_por,
-        ur.num_identificacion as documento_registrador
+        ur.nombre_completo as registrado_por
     from rendimiento r
     join matricula m on r.id_matricula = m.id_matricula
     join usuario u on m.id_jugador = u.id_usuario
@@ -313,9 +303,7 @@ begin
         r.promedio,
         r.observaciones,
         u.nombre_completo as nombre_jugador,
-        u.num_identificacion as numero_documento,
-        ur.nombre_completo as registrado_por,
-        ur.num_identificacion as documento_registrador
+        ur.nombre_completo as registrado_por
     from rendimiento r
     join matricula m on r.id_matricula = m.id_matricula
     join usuario u on m.id_jugador = u.id_usuario
@@ -355,9 +343,7 @@ begin
         r.promedio,
         r.observaciones,
         u.nombre_completo as nombre_jugador,
-        u.num_identificacion as numero_documento,
-        ur.nombre_completo as registrado_por,
-        ur.num_identificacion as documento_registrador
+        ur.nombre_completo as registrado_por
     from rendimiento r
     join matricula m on r.id_matricula = m.id_matricula
     join usuario u on m.id_jugador = u.id_usuario
@@ -391,9 +377,7 @@ begin
         r.promedio,
         r.observaciones,
         u.nombre_completo as nombre_jugador,
-        u.num_identificacion as numero_documento,
-        ur.nombre_completo as registrado_por,
-        ur.num_identificacion as documento_registrador
+        ur.nombre_completo as registrado_por
     from usuario u
     join matricula m on u.id_usuario = m.id_jugador
     join rendimiento r on r.id_matricula = m.id_matricula
@@ -418,9 +402,7 @@ select
     m.estado,
     m.observaciones,
     uj.nombre_completo as nombre_jugador,
-    uj.num_identificacion as documento_jugador,
-    ur.nombre_completo as registrado_por,
-    ur.num_identificacion as documento_registrador
+    ur.nombre_completo as registrado_por
 from matricula m
 join usuario uj on m.id_jugador = uj.id_usuario
 join usuario ur on m.id_usuario = ur.id_usuario
@@ -446,9 +428,7 @@ begin
         m.estado,
         m.observaciones,
         u.nombre_completo as nombre_jugador,
-        u.num_identificacion as documento_jugador,
-        ur.nombre_completo as registrado_por,
-        ur.num_identificacion as documento_registrador
+        ur.nombre_completo as registrado_por
     from matricula m
     join usuario u on m.id_jugador = u.id_usuario
     join usuario ur on m.id_usuario = ur.id_usuario
@@ -482,9 +462,7 @@ begin
         m.estado,
         m.observaciones,
         u.nombre_completo as nombre_jugador,
-        u.num_identificacion as documento_jugador,
-        ur.nombre_completo as registrado_por,
-        ur.num_identificacion as documento_registrador
+        ur.nombre_completo as registrado_por
     from matricula m
     join usuario u on m.id_jugador = u.id_usuario
     join usuario ur on m.id_usuario = ur.id_usuario
@@ -511,9 +489,7 @@ begin
         m.estado,
         m.observaciones,
         u.nombre_completo as nombre_jugador,
-        u.num_identificacion as documento_jugador,
-        ur.nombre_completo as registrado_por,
-        ur.num_identificacion as documento_registrador
+        ur.nombre_completo as registrado_por
     from matricula m
     join usuario u on m.id_jugador = u.id_usuario
     join usuario ur on m.id_usuario = ur.id_usuario
