@@ -495,3 +495,211 @@ begin
 end //
 
 delimiter ;
+
+
+/*almanza*/
+
+delimiter //
+create procedure proc_info_usuarios_completa_por_estado(in p_estado enum('activo','inactivo'))
+begin
+  select 
+    u.id_usuario,
+    u.nombre_completo,
+    u.correo,
+    u.tipo_documento,
+    u.num_identificacion,
+    u.genero,
+    u.fecha_nacimiento,
+    u.direccion,
+    u.telefono_1,
+    u.telefono_2,
+    u.grupo_sanguineo,
+    u.estado,
+    u.registrado_por,
+    r.rol_usuario
+  from usuario u
+  left join detalles_usuario_rol dur on dur.id_usuario = u.id_usuario
+  left join rol r on r.id_rol = dur.id_rol
+  where u.estado = p_estado;
+end;
+//
+delimiter ;
+
+delimiter //
+create procedure proc_inventario_uso_total_por_articulo(in p_nombre_articulo varchar(100))
+begin
+  select 
+    i.id_inventario,
+    i.nombre_articulo,
+    i.descripcion,
+    i.cantidad_total,
+    i.fecha_ingreso,
+    i.estado,
+    count(du.id_utiliza) as veces_utilizado,
+    sum(du.cantidad_usada) as total_utilizado
+  from inventario i
+  left join detalles_utiliza du on du.id_inventario = i.id_inventario
+  where i.nombre_articulo like concat('%', p_nombre_articulo, '%')
+  group by i.id_inventario;
+end;
+//
+delimiter ;
+
+delimiter //
+create procedure proc_pagos_detalle_por_usuario(in p_usuario int)
+begin
+  select 
+    p.id_pago,
+    p.concepto_pago,
+    p.fecha_pago,
+    p.metodo_pago,
+    p.valor_total,
+    p.observaciones,
+    u.nombre_completo as pagador,
+    m.id_matricula,
+    m.fecha_matricula,
+    m.fecha_inicio,
+    m.fecha_fin,
+    m.estado as estado_matricula
+  from pago p
+  join usuario u on u.id_usuario = p.pagado_por
+  join matricula m on m.id_matricula = p.id_matricula
+  where p.pagado_por = p_usuario;
+end;
+//
+delimiter ;
+
+delimiter //
+create procedure proc_inventario_y_uso_por_fecha(in p_fecha date)
+begin
+  select 
+    i.nombre_articulo,
+    i.descripcion,
+    du.cantidad_usada,
+    du.hora_inicio,
+    du.hora_fin,
+    du.fecha_uso,
+    u.nombre_completo as entrenador,
+    du.observaciones
+  from detalles_utiliza du
+  join inventario i on i.id_inventario = du.id_inventario
+  join usuario u on u.id_usuario = du.id_entrenador
+  where du.fecha_uso = p_fecha;
+end;
+//
+delimiter ;
+
+delimiter //
+create procedure proc_usuarios_con_roles_por_tipo_documento(in p_tipo enum('cc','ti','ce','pa','rc','pep','nit','nuip','dni','ppt'))
+begin
+  select 
+    u.id_usuario,
+    u.nombre_completo,
+    u.tipo_documento,
+    u.num_identificacion,
+    u.genero,
+    r.rol_usuario
+  from usuario u
+  left join detalles_usuario_rol dur on dur.id_usuario = u.id_usuario
+  left join rol r on r.id_rol = dur.id_rol
+  where u.tipo_documento = p_tipo;
+end;
+//
+delimiter ;
+
+delimiter //
+create procedure proc_resumen_pagos_por_matricula(in p_id_matricula int)
+begin
+  select 
+    m.id_matricula,
+    u.nombre_completo as jugador,
+    count(p.id_pago) as total_pagos,
+    sum(p.valor_total) as total_pagado,
+    min(p.fecha_pago) as primer_pago,
+    max(p.fecha_pago) as ultimo_pago
+  from pago p
+  join matricula m on m.id_matricula = p.id_matricula
+  join usuario u on u.id_usuario = m.id_jugador
+  where p.id_matricula = p_id_matricula
+  group by m.id_matricula;
+end;
+//
+delimiter ;
+
+delimiter //
+create procedure proc_uso_articulos_por_entrenador_y_rango_fecha(
+  in p_id_entrenador int,
+  in p_fecha_inicio date,
+  in p_fecha_fin date
+)
+begin
+  select 
+    du.id_utiliza,
+    i.nombre_articulo,
+    du.fecha_uso,
+    du.cantidad_usada,
+    du.hora_inicio,
+    du.hora_fin,
+    du.observaciones
+  from detalles_utiliza du
+  join inventario i on i.id_inventario = du.id_inventario
+  where du.id_entrenador = p_id_entrenador
+    and du.fecha_uso between p_fecha_inicio and p_fecha_fin;
+end;
+//
+delimiter ;
+
+delimiter //
+create procedure proc_usuarios_con_roles_y_direccion(in p_ciudad varchar(100))
+begin
+  select 
+    u.nombre_completo,
+    u.correo,
+    u.direccion,
+    r.rol_usuario
+  from usuario u
+  left join detalles_usuario_rol dur on dur.id_usuario = u.id_usuario
+  left join rol r on r.id_rol = dur.id_rol
+  where u.direccion like concat('%', p_ciudad, '%');
+end;
+//
+delimiter ;
+
+delimiter //
+create procedure proc_pagos_detalle_por_metodo_y_rango(
+  in p_metodo enum('efectivo','transferencia'),
+  in p_inicio date,
+  in p_fin date
+)
+begin
+  select 
+    p.concepto_pago,
+    p.valor_total,
+    p.fecha_pago,
+    u.nombre_completo as pagador,
+    m.id_matricula
+  from pago p
+  join usuario u on u.id_usuario = p.pagado_por
+  join matricula m on m.id_matricula = p.id_matricula
+  where p.metodo_pago = p_metodo
+    and p.fecha_pago between p_inicio and p_fin;
+end;
+//
+delimiter ;
+
+delimiter //
+create procedure proc_uso_articulos_con_nombre_entrenador(in p_nombre_entrenador varchar(100))
+begin
+  select 
+    du.id_utiliza,
+    i.nombre_articulo,
+    du.fecha_uso,
+    du.cantidad_usada,
+    u.nombre_completo as entrenador
+  from detalles_utiliza du
+  join inventario i on i.id_inventario = du.id_inventario
+  join usuario u on u.id_usuario = du.id_entrenador
+  where u.nombre_completo like concat('%', p_nombre_entrenador, '%');
+end;
+//
+delimiter ;
