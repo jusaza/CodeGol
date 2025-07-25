@@ -398,7 +398,7 @@ end //
 
 delimiter ;
 
-delimiter //
+/*delimiter //
 
 create procedure proc_actualizar_pago(
   in p_id_pago tinyint unsigned,
@@ -424,6 +424,47 @@ begin
     observaciones = p_observaciones,
     estado = v_estado
   where id_pago = p_id_pago;
+end //
+
+delimiter ;*/
+delimiter //
+
+create procedure proc_actualizar_pago(
+  in p_id_pago tinyint unsigned,
+  in p_concepto varchar(100),
+  in p_metodo enum('efectivo','transferencia'),
+  in p_valor bigint unsigned,
+  in p_observaciones varchar(100)
+)
+begin
+  declare v_estado boolean;
+
+  if p_metodo = 'efectivo' then
+    set v_estado = true;
+
+    update pago
+    set 
+      concepto_pago = p_concepto,
+      metodo_pago = p_metodo,
+      valor_total = p_valor,
+      observaciones = p_observaciones,
+      estado = v_estado,
+      fecha_pago = current_date
+    where id_pago = p_id_pago;
+
+  else
+    set v_estado = false;
+
+    update pago
+    set 
+      concepto_pago = p_concepto,
+      metodo_pago = p_metodo,
+      valor_total = p_valor,
+      observaciones = p_observaciones,
+      estado = v_estado
+    where id_pago = p_id_pago;
+
+  end if;
 end //
 
 delimiter ;

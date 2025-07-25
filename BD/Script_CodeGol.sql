@@ -143,3 +143,4 @@ create table detalles_asiste (
   constraint lf_asisjugador foreign key (id_matricula) references matricula (id_matricula),
   constraint lf_asisentrena foreign key (id_entrenamiento) references entrenamiento(id_entrenamiento)
 );
+
