@@ -78,7 +78,6 @@ create procedure actualizar_usuario(
   in p_lugar_nacimiento varchar(50),
   in p_grupo_sanguineo enum('a+','a-','b+','b-','ab+','ab-','o+','o-'),
   in p_foto_perfil blob,
-  in p_id_usuario_registro tinyint unsigned,
   in p_id_responsable tinyint unsigned
 )
 begin
@@ -96,7 +95,6 @@ begin
     lugar_nacimiento = p_lugar_nacimiento,
     grupo_sanguineo = p_grupo_sanguineo,
     foto_perfil = p_foto_perfil,
-    id_usuario_registro = p_id_usuario_registro,
     id_responsable = p_id_responsable
   where id_usuario = p_id_usuario;
 end //
@@ -212,13 +210,14 @@ begin
     p_cantidad, p_observaciones, p_id_entrenamiento, p_id_inventario
   );
 
-  -- Actualizar la cantidad del inventario
+  -- Actualizar la cantidad del inventario * pendiente
   update inventario
   set cantidad_total = cantidad_total - p_cantidad
   where id_inventario = p_id_inventario;
 end //
 
 delimiter ;
+
 delimiter //
 
 create procedure proc_devolver_cantidad_inventario(
@@ -273,7 +272,7 @@ create procedure actualizar_entrenamiento(
 )
 begin
   if exists (
-    select 1 from entrenamiento where id_entrenamiento = p_id_entrenamiento
+    select 1 from entrenamiento where id_entrenamiento = p_id_entrenamiento   /*Verifica que el ID de entrenamiento si exista en la Tabla*/
   ) then
     update entrenamiento
     set 
@@ -312,17 +311,24 @@ create procedure registrar_matricula(
   in p_fecha_inicio date,
   in p_fecha_fin date,
   in p_observaciones varchar(100),
+  in p_categoria tinyint,
+  in p_nivel enum('Bajo','Medio','Alto'),
   in p_id_jugador tinyint unsigned,
   in p_id_usuario tinyint unsigned
 )
 begin
   insert into matricula (
-	fecha_inicio, fecha_fin,
-    observaciones, id_jugador, id_usuario
+	fecha_inicio, 
+    fecha_fin,
+    observaciones,
+    categoria,
+    nivel,
+    id_jugador, 
+    id_usuario
   )
   values (
 	p_fecha_inicio, p_fecha_fin,
-    p_observaciones, p_id_jugador, p_id_usuario
+    p_observaciones,p_categoria,p_nivel, p_id_jugador, p_id_usuario
   );
 end //
 
@@ -335,14 +341,18 @@ create procedure actualizar_matricula(
   in p_id_matricula tinyint unsigned,
   in p_fecha_inicio date,
   in p_fecha_fin date,
-  in p_observaciones varchar(100)
+  in p_observaciones varchar(100),
+  in p_categoria tinyint,
+  in p_nivel enum('Bajo','Medio','Alto')
 )
 begin
   update matricula
   set 
     fecha_inicio = p_fecha_inicio,
     fecha_fin = p_fecha_fin,
-    observaciones = p_observaciones
+    observaciones = p_observaciones,
+    categoria = p_categoria,
+    nivel = p_nivel
   where id_matricula = p_id_matricula;
 end //
 
@@ -398,7 +408,7 @@ end //
 
 delimiter ;
 
-/*delimiter //
+delimiter //
 
 create procedure proc_actualizar_pago(
   in p_id_pago tinyint unsigned,
@@ -417,7 +427,7 @@ begin
   end if;
 
   update pago
-  set 
+  set
     concepto_pago = p_concepto,
     metodo_pago = p_metodo,
     valor_total = p_valor,
@@ -426,48 +436,8 @@ begin
   where id_pago = p_id_pago;
 end //
 
-delimiter ;*/
-delimiter //
-
-create procedure proc_actualizar_pago(
-  in p_id_pago tinyint unsigned,
-  in p_concepto varchar(100),
-  in p_metodo enum('efectivo','transferencia'),
-  in p_valor bigint unsigned,
-  in p_observaciones varchar(100)
-)
-begin
-  declare v_estado boolean;
-
-  if p_metodo = 'efectivo' then
-    set v_estado = true;
-
-    update pago
-    set 
-      concepto_pago = p_concepto,
-      metodo_pago = p_metodo,
-      valor_total = p_valor,
-      observaciones = p_observaciones,
-      estado = v_estado,
-      fecha_pago = current_date
-    where id_pago = p_id_pago;
-
-  else
-    set v_estado = false;
-
-    update pago
-    set 
-      concepto_pago = p_concepto,
-      metodo_pago = p_metodo,
-      valor_total = p_valor,
-      observaciones = p_observaciones,
-      estado = v_estado
-    where id_pago = p_id_pago;
-
-  end if;
-end //
-
 delimiter ;
+
 
 delimiter //
 
