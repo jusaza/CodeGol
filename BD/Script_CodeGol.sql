@@ -78,7 +78,7 @@ create table matricula (
 create table pago (
   id_pago tinyint unsigned auto_increment primary key comment 'identificador del pago',
   concepto_pago varchar(100) not null comment 'concepto o motivo del pago',
-  fecha_pago date default current_timestamp not null comment 'fecha en que se realizó el pago',
+  fecha_pago date default current_timestamp not null comment 'fecha en que se registro la factura del pago ',
   metodo_pago enum('efectivo','transferencia') null comment 'método utilizado para el pago',
   valor_total bigint unsigned not null comment 'valor total pagado',
   observaciones varchar(100) null comment 'notas adicionales del pago',
@@ -143,4 +143,3 @@ create table detalles_asiste (
   constraint lf_asisjugador foreign key (id_matricula) references matricula (id_matricula),
   constraint lf_asisentrena foreign key (id_entrenamiento) references entrenamiento(id_entrenamiento)
 );
-
